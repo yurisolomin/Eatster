@@ -1,0 +1,17 @@
+drop TABLE photo;
+drop TABLE "operation";
+drop TABLE action;
+drop TABLE waiter;
+drop TABLE restaurant;
+drop TABLE actionsubtype;
+drop TABLE "user";
+drop TABLE partner;
+drop TABLE subway;
+drop TABLE parking;
+drop TABLE cuisine;
+drop TABLE actiontype;
+drop TABLE averagecheck;
+drop TABLE tokens;
+drop table file_info;
+drop table file_content;
+drop SEQUENCE commons_files_sequence;

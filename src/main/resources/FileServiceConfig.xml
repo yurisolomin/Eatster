@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fileServiceConfig>
+	<contentStoragePath>/opt/eatster/</contentStoragePath>
+	<downloadUrlFormat><![CDATA[http://localhost:8080/eatster/servlets/file?i={0,number,#}&c={1,number,#}]]></downloadUrlFormat>
+</fileServiceConfig>

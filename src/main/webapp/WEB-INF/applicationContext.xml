@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context 
+                           http://www.springframework.org/schema/context/spring-context-4.0.xsd
+                           http://www.springframework.org/schema/task
+                           http://www.springframework.org/schema/task/spring-task.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+    <context:component-scan base-package="ru.baccasoft.eatster" />
+    <context:component-scan base-package="ru.baccasoft.utils.files" />
+    
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="org.postgresql.Driver" />
+        <property name="url" value="jdbc:postgresql://localhost:5432/eatster" />
+        <property name="username" value="eatster_user" />
+        <property name="password" value="eat" />
+        <property name="initialSize">
+            <value>5</value>
+        </property>
+        <property name="maxActive">
+            <value>50</value>
+        </property>
+        <property name="maxIdle">
+            <value>10</value>
+        </property>
+        <property name="maxWait">
+            <value>3000</value>
+        </property>
+        <property name="testOnBorrow">
+            <value>false</value>
+        </property>
+        <property name="testOnReturn">
+            <value>false</value>
+        </property>
+    </bean>
+
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <!--eatster-->
+	<property name="host" value="smtp.yandex.ru" />
+	<property name="port" value="587" />
+	<property name="username" value="no-reply@eataction.ru" />
+	<property name="password" value="eataction7" />
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.transport.protocol">smtp</prop>
+                <prop key="mail.smtp.auth">true</prop>
+                <prop key="mail.smtp.starttls.enable">true</prop>
+                <prop key="mail.debug">true</prop>
+                <prop key="mail.smtp.connectiontimeout">20000</prop>
+                <prop key="mail.smtp.timeout">20000</prop>
+                <prop key="mail.smtp.ssl.trust">*</prop>
+            </props>
+        </property>
+
+        <!--
+	<property name="host" value="smtp.gmail.com" />
+	<property name="port" value="587" />
+	<property name="username" value="yurisolomin55" />
+	<property name="password" value="gmail******" />
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.transport.protocol">smtp</prop>
+                <prop key="mail.smtp.auth">true</prop>
+                <prop key="mail.smtp.starttls.enable">true</prop>
+                <prop key="mail.debug">true</prop>
+                <prop key="mail.smtp.ssl.trust">smtp.gmail.com</prop>
+                <prop key="mail.smtp.connectiontimeout">20000</prop>
+                <prop key="mail.smtp.timeout">20000</prop>
+            </props>
+        </property>
+        -->
+    </bean>
+    
+    <bean id="preConfiguredMessage" class="org.springframework.mail.SimpleMailMessage">
+        <!--eatster-->
+        <property name="from" value="no-reply@eataction.ru"></property>
+        <!--test
+        <property name="subject" value=""/>
+        <property name="text" value=""/>
+        <property name="from" value="yurisolomin55@gmail.com"></property>
+        <property name="subject" value="Регистрация на Eatster"/>
+        <property name="text" value="Ваш пароль"/>
+        -->
+    </bean>        
+ 
+    <tx:annotation-driven proxy-target-class="true" transaction-manager="transactionManager" />
+ 
+    <bean id="transactionManager"  class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <!-- task xml settings -->
+    <bean id="calculateReportTask" class="ru.baccasoft.eatster.schedule.CalculateReportTask" />
+    <task:scheduler id="taskScheduler" pool-size="10" />
+    <task:scheduled-tasks>
+        <!--cron parameters: сек мин час деньмес мес деньнед
+        30 0 */4 1-2 * *
+        1-го и 2-го числа в 0:00:30,4:00:30,8:00:30 и т.д. 
+        -->
+        <task:scheduled ref="calculateReportTask" method="runTask" cron="30 0 */4 1-2 * *"/>
+        <!-- test 
+        14 го числа с 10-00 до 15-00 каждый час
+        <task:scheduled ref="calculateReportTask" method="runTask" cron="0 0 10-15 14 * *"/>
+        -->
+        
+    </task:scheduled-tasks>
+        
+        
+</beans>
+
+    

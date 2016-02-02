@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+    
+    <context-param>
+        <param-name>log4jConfigLocation</param-name>
+        <param-value>/WEB-INF/classes/log4j.properties</param-value>
+    </context-param>
+    <listener>
+        <listener-class>
+            org.springframework.web.util.Log4jConfigListener
+        </listener-class>
+    </listener>
+
+    <servlet>
+        <description></description>
+        <display-name>ThriftServlet</display-name>
+        <servlet-name>ThriftServlet</servlet-name>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ThriftServlet</servlet-name>
+        <url-pattern>/servlets/thrift</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ru.baccasoft.utils.files.FileDownloadServlet</servlet-name>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ru.baccasoft.utils.files.FileDownloadServlet</servlet-name>
+        <url-pattern>/servlets/file</url-pattern>
+    </servlet-mapping>
+
+    <context-param>
+        <param-name>webAppRootKey</param-name>
+        <param-value>eatsterApp</param-value>
+    </context-param>    
+
+    <context-param>
+        <description>Vaadin production mode</description>
+        <param-name>productionMode</param-name>
+        <param-value>false</param-value>
+    </context-param>
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+                                
+</web-app>
