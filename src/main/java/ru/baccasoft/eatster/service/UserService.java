@@ -249,15 +249,8 @@ public class UserService {
             item.setRegistrationDate(regDate);
             updateItem(item);
         }
-        //Регистрация для Короткова
-        boolean KorotkovAuth = false;
-        if (phone.equals("+79262209614") && password.equals("1403")) {
-            LOG.debug("KorotkovAuth!");
-            KorotkovAuth = true;
-        }
-
         //если регистрация была то пароль должен совпадать
-        if (!item.getPassword().equals(password) && (KorotkovAuth == false)) {
+        if (!item.getPassword().equals(password)) {
             LOG.debug("Fail. Bad password");
             return null;
         }
