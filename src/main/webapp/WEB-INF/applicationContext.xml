@@ -19,8 +19,8 @@
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="org.postgresql.Driver" />
         <property name="url" value="jdbc:postgresql://localhost:5432/eatster" />
-        <property name="username" value="eatster_user" />
-        <property name="password" value="eat" />
+        <property name="username" value="user" />
+        <property name="password" value="***" />
         <property name="initialSize">
             <value>5</value>
         </property>
@@ -46,7 +46,7 @@
 	<property name="host" value="smtp.yandex.ru" />
 	<property name="port" value="587" />
 	<property name="username" value="no-reply@eataction.ru" />
-	<property name="password" value="eataction7" />
+	<property name="password" value="***" />
         <property name="javaMailProperties">
             <props>
                 <prop key="mail.transport.protocol">smtp</prop>
@@ -84,7 +84,6 @@
         <!--test
         <property name="subject" value=""/>
         <property name="text" value=""/>
-        <property name="from" value="yurisolomin55@gmail.com"></property>
         <property name="subject" value="Регистрация на Eatster"/>
         <property name="text" value="Ваш пароль"/>
         -->
