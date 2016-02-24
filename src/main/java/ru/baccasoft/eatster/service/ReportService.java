@@ -15,7 +15,9 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.annotation.Transactional;
 import ru.baccasoft.eatster.model.OperationReportModel;
+import ru.baccasoft.eatster.model.PartnerModel;
 import ru.baccasoft.eatster.model.ReportModel;
+import ru.baccasoft.eatster.model.RestaurantModel;
 import ru.baccasoft.utils.logging.Logger;
 
 @SpringComponent
@@ -24,11 +26,9 @@ public class ReportService {
     
     private JdbcTemplate jdbc;
     private static final String SQL_SELECT_ALL = "select rp.id, r.id as restaurant_id, r.name as restaurant_name,"
-        +" rp.scores_total, rp.scores_spent, rp.scores_balance, rp.oper_count, rp.check_sum, rp.status, rp.report_year, rp.report_month"
+        +" rp.scores_total, rp.scores_spent, rp.oper_count, rp.check_sum, rp.status, rp.report_year, rp.report_month, rp.commission_sum"
         +" from report rp"
         +" join restaurant r on r.id = rp.restaurant_id";
-//    private static final String SQL_CLEAR_MONTH = "update report set scores_total=0, scores_spent=0, scores_balance=0, oper_count=0, check_sum=0 where report_year = ? and report_month = ?";
-//    private static final String SQL_UPDATE_RESTAURANT = "update report set scores_total=?, scores_spent=?, scores_balance=?, oper_count=?, check_sum=? where restaurant_id = ? and report_year = ? and report_month = ?";
     private static final String SQL_SELECT_BY_MONTH = SQL_SELECT_ALL+" where rp.report_year = ? and rp.report_month = ?";
     private static final String SQL_SELECT_BY_MONTH_LIMIT_ONE = SQL_SELECT_ALL+" where rp.report_year = ? and rp.report_month = ? limit 1";
     private static final String SQL_SELECT_REST_BY_MONTH = SQL_SELECT_ALL+" where rp.restaurant_id = ? and rp.report_year = ? and rp.report_month = ?";
@@ -36,13 +36,18 @@ public class ReportService {
     private static final String SQL_SELECT_BY_MONTH_IN_STATUS = SQL_SELECT_ALL+" where rp.report_year = ? and rp.report_month = ? and rp.status = ?";
     private static final String SQL_SELECT_BY_MONTH_NOTIN_STATUS = SQL_SELECT_ALL+" where rp.report_year = ? and rp.report_month = ? and rp.status <> ?";
     private static final String SQL_DELETE_BY_MONTH = "delete from report where report_year = ? and report_month = ?";
-//    private static final String SQL_SELECT_BY_RESTAURANT_LAST = SQL_SELECT_ALL+" where restaurant_id = ? order by report_year desc, report_month desc limit 1";
-    private static final String SQL_INSERT_ITEM = "insert into report (modified,restaurant_id,scores_total,scores_spent,scores_balance,oper_count,check_sum,status,report_year,report_month) values(now(),?,?,?,?,?,?,?,?,?)";
+    private static final String SQL_INSERT_ITEM = "insert into report (modified,restaurant_id,scores_total,scores_spent,oper_count,check_sum,status,report_year,report_month, commission_sum) values(now(),?,?,?,?,?,?,?,?,?)";
     private static final String SQL_UPDATE_STATUS = "update report set modified=now(),status=? where id = ?";
     private static final ReportMapper MAPPER = new ReportMapper();
     
     @Autowired
     OperationReportService operationReportService;
+    @Autowired
+    MailService mailService;
+    @Autowired
+    RestaurantService restaurantService;
+    @Autowired
+    PartnerService partnerService;
     
     @Autowired
     public void setDataSource( DataSource dataSource ) {
@@ -59,12 +64,12 @@ public class ReportService {
             item.setRestaurantName(rs.getString(++index));
             item.setScoresTotal(rs.getInt(++index));
             item.setScoresSpent(rs.getInt(++index));
-            item.setScoresBalance(rs.getInt(++index));
             item.setOperCount(rs.getInt(++index));
             item.setCheckSum(rs.getInt(++index));
             item.setStatus(rs.getString(++index));
             item.setReportYear(rs.getInt(++index));
             item.setReportMonth(rs.getInt(++index));
+            item.setCommissionSum(rs.getInt(++index));
             return item;
         }
     }	
@@ -139,12 +144,12 @@ public class ReportService {
                     ps.setLong(++index, item.getRestaurantId());     
                     ps.setInt(++index, item.getScoresTotal());
                     ps.setInt(++index, item.getScoresSpent());
-                    ps.setInt(++index, item.getScoresBalance());
                     ps.setInt(++index, item.getOperCount());
                     ps.setInt(++index, item.getCheckSum());     
                     ps.setString(++index, item.getStatus());
                     ps.setInt(++index, item.getReportYear());     
                     ps.setInt(++index, item.getReportMonth());
+                    ps.setInt(++index, item.getCommissionSum());
                     return ps;
                 }
 
@@ -165,7 +170,7 @@ public class ReportService {
         return result;
     }
     
-    //надо узнать если в этом месяце оплаченные записи.
+    //надо узнать проводился ли расчет в этом месяце
     @Transactional(readOnly=true)
     public boolean alreadyCalculated(int year, int month) {
         LOG.debug("alreadyCalculated: year={0},month={1}",year,month);
@@ -195,14 +200,16 @@ public class ReportService {
             reportModel.setRestaurantId(calc.getRestaurantId());
             reportModel.setReportYear(year);
             reportModel.setReportMonth(month);
-            reportModel.setStatus(ReportModel.STAT_FORMED);
+//            reportModel.setStatus(ReportModel.STAT_FORMED);
+            reportModel.setStatus(ReportModel.STAT_NOTPAID); //08/02/2016
             reportModel.setScoresTotal(calc.getScoresTotal());
             reportModel.setScoresSpent(calc.getScoresSpent());
-            reportModel.setScoresBalance(calc.getScoresBalance());
             reportModel.setOperCount(calc.getOperCount());
             reportModel.setCheckSum(calc.getCheckSum());
+            reportModel.setCommissionSum(calc.getCommissionSum());
             insertItem(reportModel);
         }
+        /*пока непонятно как с этим работать
         int yearPrev = year;
         int monthPrev = month - 1;
         if (monthPrev == 0) {
@@ -231,6 +238,7 @@ public class ReportService {
                 updateStatus(reportModel);
             }
         }
+        */
         LOG.debug("calculate: Ok.");
     }
     
@@ -245,6 +253,29 @@ public class ReportService {
         LOG.debug("Ok. return {0}",result);
         return result;
     }
+    
+    //отправка отчетов
+    public void sendEmails(int year, int month) {
+        LOG.info("sendEmails: year={0}, month={1}", year,month);
+        //отправим данные по email
+//        List<ReportModel> list = reportService.findByMonth(year, month);
+        List<ReportModel> list = findByMonthNotInStatus(year, month, ReportModel.STAT_PAID);
+        LOG.info("Total reports={0}", list.size());
+        int sentReports = 0;
+        for (ReportModel reportModel : list) {
+            RestaurantModel restaurantModel = restaurantService.getItem(reportModel.getRestaurantId());
+            PartnerModel partnerModel = partnerService.getItem(restaurantModel.getPartnerId());
+            LOG.info("Send report={0} to partner.email={1}, restaurant.name={2}", reportModel, partnerModel.getName(), restaurantModel.getName());
+            if (!mailService.sendReportData(partnerModel.getName(), reportModel)) {
+                LOG.warn("Error on sending email to partner.email={0}", partnerModel.getName());
+            } else {
+                ++sentReports;
+            }
+        }
+        LOG.info("sendEmails: Ok. Sent reports {0} from {1}",sentReports,list.size());
+    }
+
+    
 /*    
     @Transactional
     public void setAllFormedToNotPaid(int year, int month)  {

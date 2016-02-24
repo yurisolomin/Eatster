@@ -30,19 +30,15 @@ import ru.baccasoft.eatster.ui.component.WPasswordField;
 import ru.baccasoft.eatster.ui.component.WTextField;
 import ru.baccasoft.eatster.ui.event.WaiterLoginSuccess_Event;
 import ru.baccasoft.eatster.ui.util.LoginHelper;
-import ru.baccasoft.utils.logging.Logger;
 
 @UIScope
 @SpringView(name = WaiterLoginView.NAME)
 public class WaiterLoginView extends VerticalLayout implements View, Button.ClickListener {
-
-    private static final Logger LOG = Logger.getLogger(WaiterLoginView.class);
-
-    private static final long serialVersionUID = 1L;
     public static final String NAME = "wlogin";
+    private static final long serialVersionUID = 8606327362901830692L;
 
-    private TextField user;
-    private PasswordField password;
+    private TextField waiterUser;
+    private PasswordField waiterPassword;
     private Button loginButton;
     private LoginHelper loginHelper;
 
@@ -59,9 +55,9 @@ public class WaiterLoginView extends VerticalLayout implements View, Button.Clic
         //
         loginHelper = new LoginHelper(appProp.getLoginAttemptsInMinute());
         //
-        user = new WTextField();
-        password = new WPasswordField();
-        password.setNullRepresentation("");
+        waiterUser = new WTextField();
+        waiterPassword = new WPasswordField();
+        waiterPassword.setNullRepresentation("");
         loginButton = new WButton("Войти", this);
         loginButton.setClickShortcut(ShortcutAction.KeyCode.ENTER);
         //
@@ -75,6 +71,7 @@ public class WaiterLoginView extends VerticalLayout implements View, Button.Clic
         String defaultLogin = "";
         String defaultPass = "";
         //начало блока, который нужно зажать в прод версии ----------------
+/*        
         VerticalLayout authLayout = new VerticalLayout();
         List<WaiterModel> listWaiter = waiterService.findAll();
         if (!appProp.isShowLogins()) {
@@ -95,13 +92,14 @@ public class WaiterLoginView extends VerticalLayout implements View, Button.Clic
                 break;
             }
         }
+*/        
         //конец блока 
-        user.setValue(defaultLogin);
-        password.setValue(defaultPass);
+        waiterUser.setValue(defaultLogin);
+        waiterPassword.setValue(defaultPass);
         //
-        fields.addComponent(new VerticalLayout(new WLabel("Имя:"),user));
+        fields.addComponent(new VerticalLayout(new WLabel("Логин:"),waiterUser));
         fields.addComponent(new WLabel(""));
-        fields.addComponent(new VerticalLayout(new WLabel("Пароль:"),password));
+        fields.addComponent(new VerticalLayout(new WLabel("Пароль:"),waiterPassword));
         fields.addComponent(new WLabel(" "));
         fields.addComponent(new WLabel(" "));
         fields.addComponent(loginButton);
@@ -111,7 +109,7 @@ public class WaiterLoginView extends VerticalLayout implements View, Button.Clic
         viewLayout.setComponentAlignment(fields, Alignment.TOP_CENTER);
         viewLayout.setStyleName(Reindeer.LAYOUT_BLUE);
         addComponent(viewLayout);
-        fields.addComponent(authLayout);
+//        fields.addComponent(authLayout);
     }
     
     @Override
@@ -125,25 +123,25 @@ public class WaiterLoginView extends VerticalLayout implements View, Button.Clic
 
     @Override
     public void buttonClick(Button.ClickEvent event) {
-        if (!user.isValid() || !password.isValid()) {
+        if (!waiterUser.isValid() || !waiterPassword.isValid()) {
             return;
         }
         if (!loginHelper.isLoginEnabled()) {
             showWarning(LoginHelper.WARN_MESSAGE);
             return;
         }
-        WaiterModel waiterModel = waiterService.auth(user.getValue(), password.getValue());
+        WaiterModel waiterModel = waiterService.auth(waiterUser.getValue(), waiterPassword.getValue());
         if (waiterModel != null) {
             loginHelper.clearAttempts();
-            this.user.setComponentError(null);
-            this.password.setComponentError(null);
+            this.waiterUser.setComponentError(null);
+            this.waiterPassword.setComponentError(null);
             getUI().fire(new WaiterLoginSuccess_Event(waiterModel));
         } else {
-            this.password.setValue(null);
+            this.waiterPassword.setValue(null);
             String wrongMessage = "Неверные имя или пароль официанта";
-            this.password.focus();
-            this.user.setComponentError(new UserError(wrongMessage));
-            this.password.setComponentError(new UserError(wrongMessage));
+            this.waiterPassword.focus();
+            this.waiterUser.setComponentError(new UserError(wrongMessage));
+            this.waiterPassword.setComponentError(new UserError(wrongMessage));
             showWarning(wrongMessage);
         }
     }

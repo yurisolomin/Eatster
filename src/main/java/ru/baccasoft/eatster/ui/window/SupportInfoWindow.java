@@ -7,19 +7,18 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 public class SupportInfoWindow extends Window implements Button.ClickListener {
-    
-    private static final long serialVersionUID = 1L;
 
     private static final float WINDOW_WIDTH = 16;
     private static final float WINDOW_HIGHT = 8;
+    private static final long serialVersionUID = 4021234713806620352L;
     private Button buttonOk;
     
-    public SupportInfoWindow(String supportEmail) {
+    public SupportInfoWindow(String supportPhone,String supportEmail) {
         super("");
-        buildLayout(supportEmail);
+        buildLayout(supportPhone,supportEmail);
     }
     
-    private void buildLayout(String supportEmail) {
+    private void buildLayout(String supportPhone,String supportEmail) {
         VerticalLayout subContent = new VerticalLayout();
         subContent.setMargin(true);
         setContent(subContent);
@@ -32,16 +31,17 @@ public class SupportInfoWindow extends Window implements Button.ClickListener {
         topContent.addComponent(new Label(""));
         topContent.addComponent(caption);
         topContent.setComponentAlignment(caption, Alignment.TOP_CENTER);
-        Label text1 = new Label("Для восстановления пароля отправьте запрос на почту "+supportEmail);
-//        Label text2 = new Label("Телефон: "+supportPhone);
-//        Label text3 = new Label("E-mail: "+supportEmail);
-        text1.setWidthUndefined();
+//        Label text1 = new Label("Для восстановления пароля отправьте запрос на почту "+supportEmail);
+//        Label text1 = new Label("Для восстановление пароля вам необходимо обратиться в службу поддержки, телефон: "+supportPhone+", e-mail: "+supportEmail);
+        Label text1 = new Label("Для восстановление пароля вам необходимо обратиться в службу поддержки");
+        Label text2 = new Label("Телефон: "+supportPhone);
+        Label text3 = new Label("E-mail: "+supportEmail);
+        text1.setSizeUndefined();
 //        text2.setWidthUndefined();
         topContent.addComponent(new Label(""));
         topContent.addComponent(text1);
-//        topContent.addComponent(new Label(""));
-//        topContent.addComponent(text2);
-//        topContent.addComponent(text3);
+        topContent.addComponent(text2);
+        topContent.addComponent(text3);
         topContent.setComponentAlignment(text1, Alignment.TOP_LEFT);
         //topContent.setComponentAlignment(text2, Alignment.TOP_LEFT);
         //topContent.setComponentAlignment(text3, Alignment.TOP_LEFT);

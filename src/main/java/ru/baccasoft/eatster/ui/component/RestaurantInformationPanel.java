@@ -2,7 +2,6 @@ package ru.baccasoft.eatster.ui.component;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
@@ -20,12 +19,10 @@ import ru.baccasoft.eatster.model.RestaurantModel;
 import ru.baccasoft.eatster.service.PhotoService;
 import ru.baccasoft.eatster.ui.AppUI;
 import ru.baccasoft.eatster.ui.scope.PartnerScope;
-import ru.baccasoft.utils.logging.Logger;
 
 public class RestaurantInformationPanel extends TabSheet {
+    private static final long serialVersionUID = -3971748969794296788L;
 
-    private static final long serialVersionUID = 1L;
-    private static final Logger LOG = Logger.getLogger(RestaurantInformationPanel.class);
     private static final float WIDTH_LABEL = 4.3f;
 
     private class Fields {
@@ -51,11 +48,10 @@ public class RestaurantInformationPanel extends TabSheet {
         ComboBox subwayId = new EatsterIdComboBox(null,"Укажите метро");
         ComboBox averageCheckId = new EatsterIdComboBox(null,"Укажите средний чек");
         ComboBox parkingId = new EatsterIdComboBox(null,"Укажите парковку");
-//        MaskedTextField phone = new MaskedTextField(null, "#(###) ###-#### ");
         EatsterPhoneField phone = new EatsterPhoneField();
         TextField website = new TextField();
-        ComboBox wifi = new ComboBox();
-        ComboBox kidsMenu = new ComboBox();
+        ComboBox wifi = new EatsterAvailableComboBox(null,"Не заполнено поле 'wi-fi'");
+        ComboBox kidsMenu = new EatsterAvailableComboBox(null,"Не заполнено поле 'Детское меню'");
         TextField entertainments = new TextField();
         CheckBox cardsVisa = new CheckBox("Visa");
         CheckBox cardsMasterCard = new CheckBox("Master Card");
@@ -67,10 +63,10 @@ public class RestaurantInformationPanel extends TabSheet {
         CheckBox cardsPro100 = new CheckBox("Pro100");
         CheckBox cardsJCB = new CheckBox("JCB");
         CheckBox cardsMIR = new CheckBox("МИР");
-        ComboBox workdayStartTime = new ComboBox();
-        ComboBox workdayEndTime = new ComboBox();
-        ComboBox holidayStartTime = new ComboBox();
-        ComboBox holidayEndTime = new ComboBox();
+        ComboBox workdayStartTime = new EatsterTimeComboBox(null,"Не заполнено время начала работы в будни");
+        ComboBox workdayEndTime = new EatsterTimeComboBox(null,"Не заполнено время окончания работы в будни");
+        ComboBox holidayStartTime = new EatsterTimeComboBox(null,"Не заполнено время начала работы в выходные");
+        ComboBox holidayEndTime = new EatsterTimeComboBox(null,"Не заполнено время окончания работы в выходные");
         CheckBox workdayMonday = new CheckBox("ПН");
         CheckBox workdayTuesday = new CheckBox("ВТ");
         CheckBox workdayWednesday = new CheckBox("СР");
@@ -105,15 +101,15 @@ public class RestaurantInformationPanel extends TabSheet {
             kidsMenu.setWidth(WIDTH_DEFAULT, Unit.CM);
             entertainments.setWidth(WIDTH_ENTERTAINMENTS, Unit.CM);
             cardsVisa.setWidth(WIDTH_CARDS, Unit.CM);
-            cardsMasterCard.setWidthUndefined();// setWidth(WIDTH_SMALL, Unit.CM);
-            cardsMaestro.setWidthUndefined();//setWidth(WIDTH_CARDS, Unit.CM);
-            cardsUnionPay.setWidthUndefined();//setWidth(WIDTH_TINY, Unit.CM);
-            cardsVisaElectron.setWidthUndefined();//setWidth(WIDTH_TINY, Unit.CM);
-            cardsAmericanExpress.setWidthUndefined();//setWidth(WIDTH_SMALL, Unit.CM);
-            cardsDinersClub.setWidthUndefined();//setWidth(WIDTH_TINY, Unit.CM);
-            cardsPro100.setWidthUndefined();//setWidth(WIDTH_CARDS, Unit.CM);
-            cardsJCB.setWidthUndefined();//setWidth(WIDTH_CARDS, Unit.CM);
-            cardsMIR.setWidthUndefined();//setWidth(WIDTH_CARDS, Unit.CM);
+            cardsMasterCard.setWidthUndefined();
+            cardsMaestro.setWidthUndefined();
+            cardsUnionPay.setWidthUndefined();
+            cardsVisaElectron.setWidthUndefined();
+            cardsAmericanExpress.setWidthUndefined();
+            cardsDinersClub.setWidthUndefined();
+            cardsPro100.setWidthUndefined();
+            cardsJCB.setWidthUndefined();
+            cardsMIR.setWidthUndefined();
             
             workdayStartTime.setWidth(WIDTH_TINY, Unit.CM);
             workdayEndTime.setWidth(WIDTH_TINY, Unit.CM);
@@ -140,30 +136,6 @@ public class RestaurantInformationPanel extends TabSheet {
             phone.setRequired(true);
             phone.setRequiredError("Не заполнено поле 'Телефон'");
             phone.setValidationVisible(false);
-            wifi.setRequired(true);
-            wifi.setRequiredError("Не заполнено поле 'wi-fi'");
-            wifi.setValidationVisible(false);
-            wifi.setNullSelectionAllowed(false);
-            kidsMenu.setRequired(true);
-            kidsMenu.setRequiredError("Не заполнено поле 'Детское меню'");
-            kidsMenu.setValidationVisible(false);
-            kidsMenu.setNullSelectionAllowed(false);
-            workdayStartTime.setRequired(true);
-            workdayStartTime.setRequiredError("Не заполнено время начала работы в будни");
-            workdayStartTime.setValidationVisible(false);
-            workdayStartTime.setNullSelectionAllowed(false);
-            workdayEndTime.setRequired(true);
-            workdayEndTime.setRequiredError("Не заполнено время окончания работы в будни ''");
-            workdayEndTime.setValidationVisible(false);
-            workdayEndTime.setNullSelectionAllowed(false);
-            holidayStartTime.setRequired(true);
-            holidayStartTime.setRequiredError("Не заполнено время начала работы в выходные");
-            holidayStartTime.setValidationVisible(false);
-            holidayStartTime.setNullSelectionAllowed(false);
-            holidayEndTime.setRequired(true);
-            holidayEndTime.setRequiredError("Не заполнено время окончания работы в выходные");
-            holidayEndTime.setValidationVisible(false);
-            holidayEndTime.setNullSelectionAllowed(false);
         }
 
     }
@@ -171,11 +143,9 @@ public class RestaurantInformationPanel extends TabSheet {
     private BeanFieldGroup<RestaurantModel> fieldBindings = null;
     private RestaurantModel restaurantModel = null;
     private final RestaurantLogoPanel logoPhotoPanel = new RestaurantLogoPanel("Логотип");
-    private final PhotoService photoService;
     private Tab tabLegalData;
 
-    public RestaurantInformationPanel(PhotoService photoService) {
-        this.photoService = photoService;
+    public RestaurantInformationPanel() {
         buildLayout();
     }
 
@@ -183,7 +153,6 @@ public class RestaurantInformationPanel extends TabSheet {
         Label lab = new Label(caption);
         lab.setWidth(WIDTH_LABEL,Unit.CM);
         grid.addComponent(lab, 0, row);
-        //grid.setComponentAlignment(lab, Alignment.TOP_RIGHT);
         grid.addComponent(component, 1, row);
         grid.setComponentAlignment(component, Alignment.TOP_LEFT);
     }
@@ -242,15 +211,12 @@ public class RestaurantInformationPanel extends TabSheet {
         
         VerticalLayout tabLayout = new VerticalLayout(new Label(""),hLayout,grid);
         tabLayout.setSpacing(true);
-        tabLayout.setMargin(new MarginInfo(false, false, false, true));
+        //tabLayout.setMargin(new MarginInfo(false, false, false, true));
         addTab(tabLayout, "Публичные данные");
-        //
-        //addTab(grid, "Публичные данные");
         //
         FormLayout form;
         form = new FormLayout(fields.legalName, fields.legalAddress, fields.director, fields.bank, fields.OGRN, fields.INN, fields.corrAccount, fields.custAccount, fields.KPP, fields.BIC);
         form.setSpacing(true);
-        form.setMargin(true);
         form.setSizeUndefined();
         //
         tabLegalData = addTab(form, "Юридические данные");
@@ -266,12 +232,6 @@ public class RestaurantInformationPanel extends TabSheet {
         partnerScope.comboboxForSubway(fields.subwayId);
         partnerScope.comboboxForParking(fields.parkingId);
         partnerScope.comboboxForAverageCheck(fields.averageCheckId);
-        partnerScope.comboboxForAvailable(fields.wifi);
-        partnerScope.comboboxForAvailable(fields.kidsMenu);
-        partnerScope.comboboxForTime(fields.workdayStartTime);
-        partnerScope.comboboxForTime(fields.workdayEndTime);
-        partnerScope.comboboxForTime(fields.holidayStartTime);
-        partnerScope.comboboxForTime(fields.holidayEndTime);
     }
     
     @Override
@@ -282,10 +242,13 @@ public class RestaurantInformationPanel extends TabSheet {
     public void setRestaurantModel(RestaurantModel restaurantModel, boolean readonly) {
         this.restaurantModel = restaurantModel;
         fieldBindings = BeanFieldGroup.bindFieldsBuffered(restaurantModel, fields);
+        fields.myCoordLat.setReadOnly(false);
+        fields.myCoordLon.setReadOnly(false);
         fields.myCoordLat.setValue(restaurantModel.getCoordLat());
         fields.myCoordLon.setValue(restaurantModel.getCoordLon());
         //логотип
         long restaurantId = restaurantModel.getId();
+        PhotoService photoService = getUI().getPhotoService();
         PhotoModel logoPhotoModel = photoService.findRestaurantLogo(restaurantId);
         if (logoPhotoModel == null) {
             logoPhotoModel = new PhotoModel();
@@ -293,22 +256,41 @@ public class RestaurantInformationPanel extends TabSheet {
             logoPhotoModel.setObjectType(PhotoModel.TYPE_REST_LOGO);
             logoPhotoModel.setStatus(PhotoModel.STAT_MODERATION);
         }
+        //всем поставим только чтение
         logoPhotoPanel.setPhotoModel(logoPhotoModel,readonly);
-        /*
-        //Изменения ЮР данных партнера, не должно быть доступно партнером. (странно звучит, но этого хотел заказчик)
-        boolean legalReadOnly = getUI().isPartnerApp();
-        fields.legalName.setReadOnly(legalReadOnly);
-        fields.legalAddress.setReadOnly(legalReadOnly);
-        fields.director.setReadOnly(legalReadOnly);
-        fields.OGRN.setReadOnly(legalReadOnly);
-        fields.INN.setReadOnly(legalReadOnly);
-        fields.KPP.setReadOnly(legalReadOnly);
-        fields.bank.setReadOnly(legalReadOnly);
-        fields.BIC.setReadOnly(legalReadOnly);
-        fields.custAccount.setReadOnly(legalReadOnly);
-        fields.corrAccount.setReadOnly(legalReadOnly);
-        */
         fieldBindings.setReadOnly(readonly);
+        //но выброчно разрешим
+        fields.myCoordLat.setReadOnly(false);
+        fields.myCoordLon.setReadOnly(false);
+        fields.subwayId.setReadOnly(false);
+        fields.phone.setReadOnly(false);
+        fields.website.setReadOnly(false);
+        fields.wifi.setReadOnly(false);
+        fields.kidsMenu.setReadOnly(false);
+        fields.parkingId.setReadOnly(false);
+        fields.cardsVisa.setReadOnly(false);
+        fields.cardsMasterCard.setReadOnly(false);
+        fields.cardsMaestro.setReadOnly(false);
+        fields.cardsUnionPay.setReadOnly(false);
+        fields.cardsVisaElectron.setReadOnly(false);
+        fields.cardsAmericanExpress.setReadOnly(false);
+        fields.cardsDinersClub.setReadOnly(false);
+        fields.cardsPro100.setReadOnly(false);
+        fields.cardsJCB.setReadOnly(false);
+        fields.cardsMIR.setReadOnly(false);
+        fields.workdayStartTime.setReadOnly(false);
+        fields.workdayEndTime.setReadOnly(false);
+        fields.holidayStartTime.setReadOnly(false);
+        fields.holidayEndTime.setReadOnly(false);
+        fields.workdayMonday.setReadOnly(false);
+        fields.workdayTuesday.setReadOnly(false);
+        fields.workdayWednesday.setReadOnly(false);
+        fields.workdayThursday.setReadOnly(false);
+        fields.workdayFriday.setReadOnly(false);
+        fields.workdaySaturday.setReadOnly(false);
+        fields.workdaySunday.setReadOnly(false);
+//        fields.myCoordLat.setReadOnly(readonly);
+//        fields.myCoordLon.setReadOnly(readonly);
     }
 
     public void validate() {
@@ -340,14 +322,9 @@ public class RestaurantInformationPanel extends TabSheet {
         tabLegalData.setVisible(visible);
     }
 
-    //пока не знаю как обнулить
+    //пока не знаю как по другому обнулить
     public void clearSimpleMenus() {
         fields.kidsMenu.setValue(null);
         fields.wifi.setValue(null);
     }
-/*
-    public Button getSaveButton() {
-        return saveButton;
-    }
-*/    
 }

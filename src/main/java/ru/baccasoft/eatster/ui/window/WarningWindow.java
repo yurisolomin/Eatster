@@ -8,8 +8,8 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 public class WarningWindow extends Window implements Button.ClickListener {
-    
-    private static final long serialVersionUID = 1L;
+
+    private static final long serialVersionUID = 4691578844584937173L;
 
     private Button buttonOk;
     

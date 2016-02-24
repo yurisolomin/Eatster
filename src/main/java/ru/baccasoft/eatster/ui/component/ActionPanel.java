@@ -1,12 +1,12 @@
 package ru.baccasoft.eatster.ui.component;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.EmptyValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
@@ -38,21 +38,18 @@ public class ActionPanel extends VerticalLayout
         implements
         Button.ClickListener,
         Property.ValueChangeListener,
-        ConfirmDialog.Listener
-        {
-
-    private static final long serialVersionUID = 1L;
+        ConfirmDialog.Listener {
     private static final Logger LOG = Logger.getLogger(ActionPanel.class);
+    private static final long serialVersionUID = -4887480554699071033L;
 
     private class ActionFields {
 
         TextField name = new TextField();
-        ComboBox status = new ComboBox("Статус");//
+        ComboBox status = new EatsterStatusComboBox("Статус");//
         ComboBox actionTypeId = new EatsterIdComboBox("Тип", "Укажите тип акции");
         ComboBox actionSubTypeId = new EatsterIdComboBox("Подтип", "Укажите подтип акции");
-//        ComboBox actionTimeRangeId = new EatsterIdComboBox("Время работы", "Укажите время работы");
-        ComboBox startTime = new ComboBox();
-        ComboBox endTime = new ComboBox();
+        ComboBox startTime = new EatsterTimeComboBox(null, "Не заполнено время работы");
+        ComboBox endTime = new EatsterTimeComboBox(null, "Не заполнено время работы");
         TextArea comment = new TextArea("Условия проведения акции");//
         Image image = new Image("Фото", null);
         CheckBox onMonday = new CheckBox("ПН");
@@ -85,6 +82,10 @@ public class ActionPanel extends VerticalLayout
             comment.setWidth(WIDTH_COMMENT, Unit.CM);
             comment.setHeight(HEIGHT_IMAGE_DEFAULT, Unit.CM);
             image.setVisible(true);
+            //
+            name.setRequired(true);
+            name.setRequiredError("Не заполнено название акции");
+            name.setValidationVisible(false);
         }
 
     }
@@ -97,10 +98,10 @@ public class ActionPanel extends VerticalLayout
     private final Button btnQuestion = new Button(null, this);//"Знак вопроса"
     private final UploadField btnLoadPhoto = new ButtonUploadActionPhoto(this);
     private static final String MESSAGE_DELETE_CONFIRM = "Вы уверены, что хотите удалить акцию ?";
-    
+
     private ActionModel actionModel = null;
     private BeanFieldGroup<ActionModel> fieldsBindings = null;
-    
+
     ByteArrayOutputStream uploadOutputStream = null;
 
     public ActionPanel() {
@@ -131,29 +132,29 @@ public class ActionPanel extends VerticalLayout
         //
         int n = 1;
         addToGrid(grid, 0, 0, new Label("")); //первая колонка для небольшого отступа
-        addToGrid(grid, 0+n, 0, new Label("Название акции"));
-        addToGrid(grid, 1+n, 0, fields.name);
-        addToGrid(grid, 2+n, 0, btnDelete);
+        addToGrid(grid, 0 + n, 0, new Label("Название акции"));
+        addToGrid(grid, 1 + n, 0, fields.name);
+        addToGrid(grid, 2 + n, 0, btnDelete);
         //
         VerticalLayout vLayout = new VerticalLayout(fields.status, fields.actionTypeId, fields.actionSubTypeId);
         vLayout.setSpacing(true);
-        addToGrid(grid, 0+n, 1, vLayout);
+        addToGrid(grid, 0 + n, 1, vLayout);
         //
         HorizontalLayout hLayout = new HorizontalLayout(fields.image, btnQuestion, fields.comment);
         hLayout.setSpacing(true);
-        addToGrid(grid, 1+n, 1, hLayout);
+        addToGrid(grid, 1 + n, 1, hLayout);
         //
-        addToGrid(grid, 1+n, 2, new Label(""));
+        addToGrid(grid, 1 + n, 2, new Label(""));
         //
         hLayout = new HorizontalLayout(fields.onMonday, fields.onTuesday, fields.onWednesday, fields.onThursday, fields.onFriday, fields.onSaturday, fields.onSunday);
         hLayout.setSpacing(true);
         hLayout = new HorizontalLayout(new Label("Время работы с"), fields.startTime, new Label("по"), fields.endTime, hLayout);
         hLayout.setSpacing(true);
-        addToGrid(grid, 1+n, 3, hLayout);
+        addToGrid(grid, 1 + n, 3, hLayout);
         //
-        addToGrid(grid, 1+n, 4, btnLoadPhoto);
+        addToGrid(grid, 1 + n, 4, btnLoadPhoto);
         grid.setComponentAlignment(btnLoadPhoto, Alignment.TOP_RIGHT);
-        addToGrid(grid, 2+n, 4, btnSave);
+        addToGrid(grid, 2 + n, 4, btnSave);
     }
 
     @Override
@@ -164,7 +165,7 @@ public class ActionPanel extends VerticalLayout
     @Override
     public void buttonClick(Button.ClickEvent event) {
         if (event.getButton() == btnDelete) {
-            ConfirmDialog.show(getUI(), "Пожалуйста, подтвердите:", MESSAGE_DELETE_CONFIRM, "Да", "Нет", this);        
+            ConfirmDialog.show(getUI(), "Пожалуйста, подтвердите:", MESSAGE_DELETE_CONFIRM, "Да", "Нет", this);
 //            getUI().fire(new ActionDelete_Event(this));
         }
         if (event.getButton() == btnSave) {
@@ -178,37 +179,48 @@ public class ActionPanel extends VerticalLayout
 
     private void save() {
         try {
+            //Кнопка сохранить: сохраняет изменения в акции и переводи акцию в статус на модерации
+            //для партнера
+            if (getUI().isPartnerApp()) {
+                fields.status.setValue(ActionModel.STAT_MODERATION);
+            }
             try {
+                fields.name.validate();
                 fields.actionTypeId.validate();
                 fields.actionSubTypeId.validate();
-                //Кнопка сохранить: сохраняет изменения в акции и переводи акцию в статус на модерации
-                //для партнера
-                if (getUI().isPartnerApp()) {
-                    fields.status.setValue(ActionModel.STAT_MODERATION);
-                }
-            } catch(EmptyValueException e) {
-                Notification.show(e.getMessage(), Notification.Type.ERROR_MESSAGE);
+                fields.startTime.validate();
+                fields.endTime.validate();
+            } catch (Validator.InvalidValueException e) {
+                Notification.show(e.getMessage(), Notification.Type.WARNING_MESSAGE);
                 return;
             }
-            // Commit the fields from UI to DAO
             fieldsBindings.commit();
+            if (!actionModel.isOnMonday()
+                    && !actionModel.isOnTuesday()
+                    && !actionModel.isOnThursday()
+                    && !actionModel.isOnWednesday()
+                    && !actionModel.isOnFriday()
+                    && !actionModel.isOnSaturday()
+                    && !actionModel.isOnSunday()) {
+                throw new EmptyValueException("Необходимо выбрать хотя бы 1 день недели");
+            }
             getUI().fire(new ActionSave_Event(this));
         } catch (FieldGroup.CommitException e) {
             LOG.error("Error on save action: " + e.getMessage());
             Notification.show("Ошибка в данных: " + e.getMessage(), Notification.Type.ERROR_MESSAGE);
-            // Validation exceptions could be shown here
+        } catch (EmptyValueException e) {
+            Notification.show(e.getMessage(), Notification.Type.WARNING_MESSAGE);
         }
     }
 
-    
     private void refreshComboBox() {
         PartnerScope partnerScope = getUI().getPartnerScope();
         partnerScope.comboboxForActionStatus(fields.status);
         partnerScope.comboboxForActionType(fields.actionTypeId);
         fields.actionSubTypeId.removeAllItems();
-        partnerScope.comboboxForTime(fields.startTime);
-        partnerScope.comboboxForTime(fields.endTime);
-        
+//        partnerScope.comboboxForTime(fields.startTime);
+//        partnerScope.comboboxForTime(fields.endTime);
+
     }
 
     public ActionModel getActionModel() {
@@ -223,6 +235,7 @@ public class ActionPanel extends VerticalLayout
         }
         fields.image.setSource(photoExternalResource);
     }
+
     public void setActionModel(ActionModel actionModel) {
         fields.actionTypeId.removeValueChangeListener(this);
         fields.actionTypeId.setImmediate(false);
@@ -239,8 +252,8 @@ public class ActionPanel extends VerticalLayout
         //учтем соотношение сторон по настройкам максимальных размеров фото
 //        AppProp appProp = getUI().getAppProp();
 //        ImageValidator imageValidator= new ImageValidatorActionPhoto(appProp);
-        ImageValidator imageValidator= getUI().getPartnerScope().getImageValidatorActionPhoto();
-        fields.image.setWidth(fields.HEIGHT_IMAGE_DEFAULT*imageValidator.getWidthHeightRatio(),Unit.CM);
+        ImageValidator imageValidator = getUI().getPartnerScope().getImageValidatorActionPhoto();
+        fields.image.setWidth(fields.HEIGHT_IMAGE_DEFAULT * imageValidator.getWidthHeightRatio(), Unit.CM);
     }
 
     @Override
@@ -252,7 +265,7 @@ public class ActionPanel extends VerticalLayout
         partnerScope.comboboxForActionSubType(fields.actionSubTypeId, actionId);
         fields.actionSubTypeId.clear();
         //После выбора типа, предлагаю автоматически подставлять подтип. (Скидка-скидка, подарок-подарок, и тп)
-        ActionSubTypeModel defaultItem = partnerScope.comboboxFindActionSubType(actionId,actionName);
+        ActionSubTypeModel defaultItem = partnerScope.comboboxFindActionSubType(actionId, actionName);
         if (defaultItem != null) {
             fields.actionSubTypeId.setValue(defaultItem.getId());
         }

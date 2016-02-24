@@ -7,57 +7,35 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
-import java.util.List;
 import ru.baccasoft.eatster.model.PartnerModel;
 import ru.baccasoft.eatster.model.RestaurantModel;
-import ru.baccasoft.eatster.model.WaiterModel;
-import ru.baccasoft.eatster.service.ActionService;
 import ru.baccasoft.eatster.service.MailService;
-import ru.baccasoft.eatster.service.OperationService;
-import ru.baccasoft.eatster.service.OperationTotalService;
 import ru.baccasoft.eatster.service.PartnerService;
-import ru.baccasoft.eatster.service.PhotoService;
 import ru.baccasoft.eatster.service.RestaurantService;
-import ru.baccasoft.eatster.service.WaiterService;
 import ru.baccasoft.eatster.ui.AppUI;
+import ru.baccasoft.eatster.ui.event.Logout_Event;
 import ru.baccasoft.utils.logging.Logger;
 
-public class RestaurantPanel extends VerticalLayout implements Button.ClickListener {
+public class MainMenuItemRestaurant extends MainMenuItemLayout implements 
+        Button.ClickListener {
 
-    private static final Logger LOG = Logger.getLogger(RestaurantPanel.class);
-    private static final long serialVersionUID = 1L;
+    private static final Logger LOG = Logger.getLogger(MainMenuItemRestaurant.class);
+    private static final long serialVersionUID = -7232693943423592910L;
 
     private RestaurantHeaderPanel headerPanel;
     private RestaurantInformationPanel informationPanel;
     private RestaurantPartnerPanel partnerPanel;
     private RestaurantActionsPanel actionsPanel;
     private RestaurantPhotosPanel photosPanel;
-//    private RestaurantOperationsPanel operationsPanel;
     private RestaurantOperTabSheetPanel operationsPanel;
     private RestaurantWaitersPanel waitersPanel;
     private final Button saveInformationButton = new Button("Сохранить", this);
     private final Button savePartnerButton = new Button("Сохранить", this);
     private final Button createActionButton = new Button("Создать акцию", this);
-//    private boolean showAllOperations = false;
     private RestaurantModel restaurantModel;
     private PartnerModel partnerModel;
     
-    private final PhotoService photoService;
-    private final ActionService actionService;
-    private final RestaurantService restaurantService;
-    private final PartnerService partnerService;
-    private final OperationTotalService operationTotalService;
-    private final OperationService operationService;
-    private final WaiterService waiterService;
-
-    public RestaurantPanel(PhotoService photoService, ActionService actionService, RestaurantService restaurantService, PartnerService partnerService, OperationTotalService operationTotalService, OperationService operationService, WaiterService waiterService) {
-        this.photoService = photoService;
-        this.actionService = actionService;
-        this.restaurantService = restaurantService;
-        this.partnerService = partnerService;
-        this.operationTotalService = operationTotalService;
-        this.operationService = operationService;
-        this.waiterService = waiterService;
+    public MainMenuItemRestaurant() {
         super.addComponent(buildLayout());
     }
     
@@ -69,10 +47,10 @@ public class RestaurantPanel extends VerticalLayout implements Button.ClickListe
         restaurantLayout.addComponent(createActionButton);
         restaurantLayout.addComponent(savePartnerButton);
         //
-        informationPanel = new RestaurantInformationPanel(photoService);
+        informationPanel = new RestaurantInformationPanel();
         restaurantLayout.addComponent(informationPanel);
         //
-        actionsPanel = new RestaurantActionsPanel(actionService);
+        actionsPanel = new RestaurantActionsPanel();
         restaurantLayout.addComponent(actionsPanel);
         //
         partnerPanel = new RestaurantPartnerPanel();
@@ -85,7 +63,7 @@ public class RestaurantPanel extends VerticalLayout implements Button.ClickListe
         waitersPanel = new RestaurantWaitersPanel();
         restaurantLayout.addComponent(waitersPanel);
         //
-        photosPanel = new RestaurantPhotosPanel(photoService);
+        photosPanel = new RestaurantPhotosPanel();
         restaurantLayout.addComponent(photosPanel);
         //
         informationPanel.setVisible(true);
@@ -111,7 +89,7 @@ public class RestaurantPanel extends VerticalLayout implements Button.ClickListe
                 Notification.show("ВЫ НЕ СОХРАНИЛИ НОВУЮ АКЦИЮ", Notification.Type.HUMANIZED_MESSAGE);
                 return;
             }
-            actionsPanel.createActionPanel();
+            actionsPanel.addNewActionPanel();
             Notification.show("НОВАЯ АКЦИЯ", Notification.Type.HUMANIZED_MESSAGE);
         }
         if (event.getButton() == savePartnerButton) {
@@ -124,10 +102,6 @@ public class RestaurantPanel extends VerticalLayout implements Button.ClickListe
             try {
                 informationPanel.validate();
             } 
-            catch(Validator.EmptyValueException e) {
-                Notification.show(e.getMessage(), Notification.Type.WARNING_MESSAGE);
-                return;
-            }
             catch(Validator.InvalidValueException e) {
                 Notification.show(e.getMessage(), Notification.Type.WARNING_MESSAGE);
                 return;
@@ -135,19 +109,23 @@ public class RestaurantPanel extends VerticalLayout implements Button.ClickListe
             LOG.debug("Commit restaurant. Before data={0}",restaurantModel);
             informationPanel.commit();
             headerPanel.commit();
-/*в новом ТЗ этого нет            
+            /*в новом ТЗ этого нет но Коротков просил добавить*/
             //проверим не поменялся ли статус заведения
+            //если статус поменялся на Active то отправим уведомление партнеру
+            RestaurantService restaurantService = getUI().getRestaurantService();
             RestaurantModel restaurantModelOld = restaurantService.getItem(restaurantModel.getId());
-            if (!restaurantModelOld.getStatus().equals(restaurantModel.getStatus())) {
-                String newStatusRus = headerPanel.getStatusRus();
+            if (restaurantModel.getStatus().equals(RestaurantModel.STAT_ACTIVE)
+                && !restaurantModelOld.getStatus().equals(restaurantModel.getStatus())) {
+                //String newStatusRus = headerPanel.getStatusRus();
                 String partnerEMail = partnerModel.getName();
                 MailService mailService = getUI().getMailService();
-                if (!mailService.send(partnerEMail,"Системное уведомление от Eatster","Статус Вашего заведения изменен на \""+newStatusRus+"\"")) {
+//                if (!mailService.send(partnerEMail,"Системное уведомление от Eatster","Статус Вашего заведения изменен на \""+newStatusRus+"\"")) {
+                if (!mailService.sendRestaurantActivated(partnerEMail)) {
                     LOG.debug("Fail. Mail not sent.");
-                    throw new RuntimeException("Error on restaurant registration!");
+                    throw new RuntimeException("Error send e-mail on restaurant status activated!");
                 }
             }
-*/
+
             restaurantService.updateItem(restaurantModel);
             String msg = String.format("'%s' сохранен.",restaurantModel.getName());
             Notification.show(msg, Notification.Type.HUMANIZED_MESSAGE);
@@ -180,6 +158,7 @@ public class RestaurantPanel extends VerticalLayout implements Button.ClickListe
         try {
             LOG.debug("Commit partner. Before data={0}",partnerModel);
             partnerPanel.commit();
+            PartnerService partnerService = getUI().getPartnerService();
             partnerService.updateItem(partnerModel);
             String msg = String.format("'%s' сохранен.",partnerModel.getName());
             Notification.show(msg, Notification.Type.HUMANIZED_MESSAGE);
@@ -195,65 +174,51 @@ public void refreshRestaurantPanel() {
         informationPanel.setRestaurantModel(restaurantModel,readonlyInformation);
         headerPanel.bindFieldsBuffered(restaurantModel);
         //
+        PartnerService partnerService = getUI().getPartnerService();
         partnerModel = partnerService.getItem(restaurantModel.getPartnerId());
         partnerPanel.bindFieldsBuffered(partnerModel);
-        operationsPanel.setRestaurantId(restaurantModel.getId());
         //
-        List<WaiterModel> waiterList = waiterService.findByRestaurant(restaurantModel.getId());
-        waitersPanel.bindFieldsBuffered(waiterList);
+        actionsPanel.setRestaurantId(restaurantModel.getId());
+        operationsPanel.setRestaurantId(restaurantModel.getId());
+        waitersPanel.setRestaurantId(restaurantModel.getId());
+        photosPanel.setRestaurantId(restaurantModel.getId());
+        //
+        saveInformationButton.setVisible(false);
+        createActionButton.setVisible(false);
+        savePartnerButton.setVisible(false);
+        headerPanel.setStatusEnabled(false);
         //
         boolean isAdmin = getUI().getPartnerModel().isAdmin();
         if (informationPanel.isVisible()) {
             headerPanel.setStatusEnabled(isAdmin);
             headerPanel.setButtonsEnabled(false,true,true,true,true,true);
             saveInformationButton.setVisible(true);
-            createActionButton.setVisible(false);
-            savePartnerButton.setVisible(false);
-//            createPhotoButton.setVisible(false);
         }
         if (actionsPanel.isVisible()) {
-            headerPanel.setStatusEnabled(false);
             headerPanel.setButtonsEnabled(true,false,true,true,true,true);
-            saveInformationButton.setVisible(false);
             createActionButton.setVisible(true);
-            savePartnerButton.setVisible(false);
-//            createPhotoButton.setVisible(false);
             actionsPanel.refresh();
         }
         if (photosPanel.isVisible()) {
-            headerPanel.setStatusEnabled(false);
             headerPanel.setButtonsEnabled(true,true,true,true,true,false);
-            saveInformationButton.setVisible(false);
-            createActionButton.setVisible(false);
-            savePartnerButton.setVisible(false);
-//            createPhotoButton.setVisible(true);
             photosPanel.refresh();
         }
         if (partnerPanel.isVisible()) {
-            headerPanel.setStatusEnabled(false);
             headerPanel.setButtonsEnabled(true,true,false,true,true,true);
-            saveInformationButton.setVisible(false);
-            createActionButton.setVisible(false);
             savePartnerButton.setVisible(true);
-//            createPhotoButton.setVisible(false);
         }
         if (operationsPanel.isVisible()) {
-            headerPanel.setStatusEnabled(false);
             headerPanel.setButtonsEnabled(true,true,true,false,true,true);
-            saveInformationButton.setVisible(false);
-            createActionButton.setVisible(false);
-            savePartnerButton.setVisible(false);
-//            createPhotoButton.setVisible(false);
+            operationsPanel.refresh();
         }
         if (waitersPanel.isVisible()) {
-            headerPanel.setStatusEnabled(false);
             headerPanel.setButtonsEnabled(true,true,true,true,false,true);
-            saveInformationButton.setVisible(false);
-            createActionButton.setVisible(false);
-            savePartnerButton.setVisible(false);
-//            createPhotoButton.setVisible(false);
+            waitersPanel.refresh();
         }
-        
+        // При статусе «Авторизирован по e-mail:» Заведению доступна только страница «информация»
+        if (!isAdmin && restaurantModel.getStatus().equals(RestaurantModel.STAT_UNAUTH)) {
+            headerPanel.setButtonsEnabled(false,false,false,false,false,false);
+        }
     }
     
     @Override
@@ -317,4 +282,30 @@ public void refreshRestaurantPanel() {
     public PartnerModel getPartnerModel() {
         return partnerModel;
     }
+    
+    @Override
+    public void doRefresh() {
+        //защита от неизвестного
+        if (restaurantModel == null) {
+            return;
+        }
+        long restaurantId = restaurantModel.getId();
+        //для нового ресторана не обновляем
+        if (restaurantId == 0) {
+            return;
+        }
+        RestaurantService restaurantService = getUI().getRestaurantService();
+        restaurantModel = restaurantService.getItem(restaurantId);
+        //неожиданно, но возможно
+        if (restaurantModel == null) {
+           getUI().fire(new Logout_Event());
+           return;
+        }
+        actionsPanel.clear();
+        photosPanel.clear();
+        operationsPanel.clear();
+        waitersPanel.clear();
+        refreshRestaurantPanel();
+    }
+
 }

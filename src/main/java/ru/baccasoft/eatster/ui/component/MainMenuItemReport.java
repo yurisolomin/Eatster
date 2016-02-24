@@ -22,9 +22,9 @@ import ru.baccasoft.eatster.service.OperationReportService;
 import ru.baccasoft.eatster.service.ReportService;
 import ru.baccasoft.eatster.ui.AppUI;
 
-public class ReportPanel extends VerticalLayout implements Button.ClickListener {
+public class MainMenuItemReport extends MainMenuItemLayout implements Button.ClickListener {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 7816068936409020272L;
 
     DateField fieldRepMonth = new DateField();
     DateField fieldCurMonth = new DateField();
@@ -33,8 +33,9 @@ public class ReportPanel extends VerticalLayout implements Button.ClickListener 
     private final Button buttonRepMonthExportToExcel = new Button("Выгрузить в XLS", this);
     private final Button buttonCurMonthExportToExcel = new Button("Выгрузить в XLS", this);
     private final Button buttonRepMonthCalc = new Button("Рассчитать", this);
-    private final OperationReportService operationReportService;
-    private final ReportService reportService;
+    private final Button buttonRepMonthSend = new Button("Отправка E-mail", this);
+//    private final OperationReportService operationReportService;
+//    private final ReportService reportService;
     private final Button buttonShowCurMonth = new Button("Показать", this);
     private final Button buttonShowRepMonth = new Button("Показать", this);
     private final static String LABEL_NO_DATA = "НЕТ ДАННЫХ.";
@@ -44,9 +45,7 @@ public class ReportPanel extends VerticalLayout implements Button.ClickListener 
     private final static int FIX_ROW_COUNT = 10;
     private final static String titleForButtonColumn = "";
 
-    public ReportPanel(OperationReportService operationReportService,ReportService reportService) {
-        this.operationReportService = operationReportService;
-        this.reportService = reportService;
+    public MainMenuItemReport() {
         buildLayout();
     }
 
@@ -69,18 +68,19 @@ public class ReportPanel extends VerticalLayout implements Button.ClickListener 
         gridReport.addComponent(label, 0, 0);
         gridReport.addComponent(fieldRepMonth, 1, 0);
         gridReport.addComponent(buttonShowRepMonth, 2, 0);
-        HorizontalLayout layout = new HorizontalLayout(buttonRepMonthCalc,buttonRepMonthExportToExcel);
+        HorizontalLayout layout = new HorizontalLayout(buttonRepMonthCalc,buttonRepMonthSend,buttonRepMonthExportToExcel);
         layout.setSpacing(true);
-//        gridReport.addComponent(buttonRepMonthExportToExcel, 3, 0);
         gridReport.addComponent(layout, 3, 0);
         gridReport.setColumnExpandRatio(3,3f);
-//        gridReport.setComponentAlignment(buttonRepMonthExportToExcel, Alignment.TOP_RIGHT);
         gridReport.setComponentAlignment(layout, Alignment.TOP_RIGHT);
         //
         tableRepMonth.addContainerProperty("Ресторан", String.class, null);
+        tableRepMonth.addContainerProperty("Оборот", Integer.class, null);
         tableRepMonth.addContainerProperty("Баллов начислено", Integer.class, null);
         tableRepMonth.addContainerProperty("Баллов списано", Integer.class, null);
-        tableRepMonth.addContainerProperty("Итого", Integer.class, null);
+        tableRepMonth.addContainerProperty("Комиссия EatAction", Integer.class, null);
+        tableRepMonth.addContainerProperty("Сальдо выплат", Integer.class, null);
+        tableRepMonth.addContainerProperty("Прибыль EatAction", Integer.class, null);
         tableRepMonth.addContainerProperty("Статус платежа", String.class, null);
         tableRepMonth.addContainerProperty(titleForButtonColumn, Button.class, null);
         tableRepMonth.setSizeFull();
@@ -89,9 +89,12 @@ public class ReportPanel extends VerticalLayout implements Button.ClickListener 
 //        tableRepMonth.setColumnCollapsible(titleForButtonColumn, false);
         //
         tableCurMonth.addContainerProperty("Ресторан", String.class, null);
+        tableCurMonth.addContainerProperty("Оборот", Integer.class, null);
         tableCurMonth.addContainerProperty("Баллов начислено", Integer.class, null);
         tableCurMonth.addContainerProperty("Баллов списано", Integer.class, null);
-        tableCurMonth.addContainerProperty("Итого", Integer.class, null);
+        tableCurMonth.addContainerProperty("Комиссия EatAction", Integer.class, null);
+        tableCurMonth.addContainerProperty("Сальдо выплат", Integer.class, null);
+        tableCurMonth.addContainerProperty("Прибыль EatAction", Integer.class, null);
         tableCurMonth.setSizeFull();
         tableCurMonth.setColumnCollapsingAllowed(false);
         tableCurMonth.setColumnReorderingAllowed(true);
@@ -127,7 +130,9 @@ public class ReportPanel extends VerticalLayout implements Button.ClickListener 
         tabSheet.addTab(curmonthPanel,"Текущий месяц");
         tabSheet.addTab(reportPanel,"Отчеты");
         addComponent(tabSheet);
-        
+        //
+        //покажем если требуется кнопку отправки отчетов
+        //buttonRepMonthSend.setVisible(getUI().getAppProp().isButtonSendReports());
     }
 
     @Override
@@ -136,15 +141,19 @@ public class ReportPanel extends VerticalLayout implements Button.ClickListener 
     }
 
     public void showCurrentMonth() {
+        OperationReportService operationReportService = getUI().getOperationReportService();
         List<OperationReportModel> list = operationReportService.getByMonth(getCurrentYear(),getCurrentMonth());
         tableCurMonth.removeAllItems();
         int row = 0;
         for(OperationReportModel oper: list) {
             tableCurMonth.addItem(new Object[]{
                 oper.getRestaurantName(),
+                oper.getCheckSum(),
                 oper.getScoresTotal(),
                 oper.getScoresSpent(),
-                oper.getScoresBalance()
+                oper.getCommissionSum(),
+                oper.getCalcPayOffBalance(),
+                oper.getCalcIncomeSum()
                 }, ++row);            
         }
         if (row > FIX_ROW_COUNT) {
@@ -185,6 +194,7 @@ public class ReportPanel extends VerticalLayout implements Button.ClickListener 
     public void showReportMonth() {
         int iMonth = getReportMonth();
         int iYear = getReportYear();
+        ReportService reportService = getUI().getReportService();
         List<ReportModel> list = reportService.findByMonth(iYear, iMonth);
         tableRepMonth.removeAllItems();
         int row = 0;
@@ -193,9 +203,12 @@ public class ReportPanel extends VerticalLayout implements Button.ClickListener 
             buttonChangeStatus.setData(oper);
             tableRepMonth.addItem(new Object[]{
                 oper.getRestaurantName(),
+                oper.getCheckSum(),
                 oper.getScoresTotal(),
                 oper.getScoresSpent(),
-                oper.getScoresBalance(),
+                oper.getCommissionSum(),
+                oper.calcPayOffBalance(),
+                oper.calcIncomeSum(),
                 oper.getStatusRus(),
                 buttonChangeStatus
                 }, ++row);            
@@ -237,11 +250,13 @@ public class ReportPanel extends VerticalLayout implements Button.ClickListener 
         if (event.getButton() == buttonRepMonthCalc) {
             int year = getReportYear();
             int month = getReportMonth();
+            ReportService reportService = getUI().getReportService();
             if (!reportService.canCalculate(year,month)) {
-                Notification.show("Не могу пересчитать месяц! Обнаружены записи со статусом '"+ReportModel.STAT_PAID+"'.", Notification.Type.WARNING_MESSAGE);
+                Notification.show("Не могу пересчитать месяц! Обнаружены записи со статусом '"+ReportModel.STAT_PAID_RUS+"'.", Notification.Type.WARNING_MESSAGE);
                 return;
             }
             reportService.calculate(year, month);
+            //reportService.sendEmails(year, month);
 /*            //проставимпредыдущий месяц в не оплачено
             --month;
             if (month < 1) {
@@ -251,6 +266,13 @@ public class ReportPanel extends VerticalLayout implements Button.ClickListener 
             reportService.setAllFormedToNotPaid(year, month);*/
             Notification.show("РАСЧЕТ ПРОШЕЛ УСПЕШНО.", Notification.Type.HUMANIZED_MESSAGE);
             showReportMonth();
+        }
+        if (event.getButton() == buttonRepMonthSend) {
+            int year = getReportYear();
+            int month = getReportMonth();
+            ReportService reportService = getUI().getReportService();
+            reportService.sendEmails(year, month);
+            Notification.show("ОТПРАВКА ЗАВЕРШЕНА.", Notification.Type.HUMANIZED_MESSAGE);
         }
         if (event.getButton() == buttonShowCurMonth) {
             showCurrentMonth();
@@ -265,6 +287,16 @@ public class ReportPanel extends VerticalLayout implements Button.ClickListener 
             excelExport.setReportTitle("Текущий месяц");
             excelExport.export();
         }
+    }
+
+    public Button getButtonRepMonthSend() {
+        return buttonRepMonthSend;
+    }
+
+    //при переключении на этот элемент мы не будем ничего обновлять
+    //пусть пользователь снова жмет кнопку для обновления
+    @Override
+    public void doRefresh() {
     }
     
 }

@@ -21,30 +21,17 @@ public class OperationReportService {
     
     private JdbcTemplate jdbc;
     private static final String SQL_SELECT_TOTAL = "select r.id as restaurant_id, r.name as restaurant_name,"
-        +" COALESCE( sum(case when o.score > 0 then  o.score else 0 end), 0) as scores_total,"
-        +" COALESCE( sum(case when o.score < 0 then -o.score else 0 end), 0) as scores_spent,"
+        +" COALESCE( sum(add_score), 0) as scores_total,"
+        +" COALESCE( sum(dec_score), 0) as scores_spent,"
         +" count(*) as oper_count,"
-        +" COALESCE( sum(check_sum), 0) as check_sum"
+        +" COALESCE( sum(check_sum), 0) as check_sum,"
+        +" COALESCE(sum(check_sum * commission_rate / 100),0) as commission_sum"
         +" from restaurant r"
         +" join operation o on o.restaurant_id = r.id"
         +" where o.oper_date between ? and ? and o.status = '"+OperationModel.STATUS_CONFIRMED+"'"
         +" group by r.id, r.name";
     private static final OperationReportMapper MAPPER = new OperationReportMapper();
 
-/*
-select r.id as restaurant_id, r.name as restaurant_name, 
-COALESCE( sum(case when o.score > 0 then  o.score else 0 end), 0) as scores_total,
-COALESCE( sum(case when o.score < 0 then -o.score else 0 end), 0) as scores_spent,
---COALESCE( sum(case when o.check_sum > 0 then  o.check_sum else 0 end), 0) as check_sum_total,
---COALESCE( sum(case when o.check_sum < 0 then -o.check_sum else 0 end), 0) as check_sum_spent,
-count(*) as oper_count,
-0
-from restaurant r
-join operation o on o.restaurant_id = r.id
-where oper_date between '2015-01-01' and '2015-12-31'
-group by r.id
-    */    
-    
     @Autowired
     public void setDataSource( DataSource dataSource ) {
         jdbc = new JdbcTemplate( dataSource );
@@ -61,7 +48,7 @@ group by r.id
             item.setScoresSpent(rs.getInt(++index));
             item.setOperCount(rs.getInt(++index));
             item.setCheckSum(rs.getInt(++index));
-            item.setScoresBalance(item.getScoresTotal()-item.getScoresSpent());
+            item.setCommissionSum(rs.getInt(++index));
             return item;
         }
     }	

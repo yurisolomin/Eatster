@@ -8,7 +8,6 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 import java.util.List;
 import ru.baccasoft.eatster.model.UserReportModel;
 import ru.baccasoft.eatster.service.UserReportService;
@@ -16,9 +15,9 @@ import ru.baccasoft.eatster.ui.AppUI;
 import ru.baccasoft.eatster.ui.window.HelpUsersFilterWindow;
 import ru.baccasoft.eatster.ui.window.UserChangeScoresWindow;
 
-public class UsersPanel extends VerticalLayout implements Button.ClickListener {
+public class MainMenuItemUsers extends MainMenuItemLayout implements Button.ClickListener {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 6141027723072585158L;
 
     private class Fields {
         private static final int WIDTH_FIELD = 6;
@@ -34,14 +33,13 @@ public class UsersPanel extends VerticalLayout implements Button.ClickListener {
     private final Button buttonFilter = new Button("Отфильтровать", this);
     private final Button buttonHelp = new Button(null, this);//"Знак вопроса"
     private final Button buttonExportToExcel = new Button("Выгрузить в XLS", this);
-    private final UserReportService userReportService;
+//    private final UserReportService userReportService;
     private final Label labelNoData = new Label("");
     private final int GRID_ROWS_SIZE = 10;
     private final String BUTTON_SCORES_COLUMN_TITLE = "";
     private final String BUTTON_SCORES_CAPTION = "Изменить баллы";
 
-    public UsersPanel(UserReportService userReportService) {
-        this.userReportService = userReportService;
+    public MainMenuItemUsers() {
         buildLayout();
     }
 
@@ -78,7 +76,7 @@ public class UsersPanel extends VerticalLayout implements Button.ClickListener {
         usersGrid.addContainerProperty("Потрачено баллов", Integer.class, null);
         usersGrid.addContainerProperty("Количество операций", Integer.class, null);
         usersGrid.setSizeFull();
-        usersGrid.setColumnCollapsingAllowed(true);
+        usersGrid.setColumnCollapsingAllowed(false);
         usersGrid.setColumnReorderingAllowed(true);
         usersGrid.setPageLength(0);
         addComponent(usersGrid);
@@ -138,6 +136,7 @@ public class UsersPanel extends VerticalLayout implements Button.ClickListener {
             value = "";
         }
         List<UserReportModel> list;
+        UserReportService userReportService = getUI().getUserReportService();
         try {
             Long longValue = Long.parseLong(value);
             list = userReportService.findByUserId(longValue);
@@ -180,6 +179,12 @@ public class UsersPanel extends VerticalLayout implements Button.ClickListener {
             getUI().addWindow(window);
             //changeStatus(reportModel);
         }
+    }
+
+    //при переключении на этот элемент мы не будем ничего обновлять
+    //пусть пользователь снова жмет кнопку для обновления
+    @Override
+    public void doRefresh() {
     }
 
 }

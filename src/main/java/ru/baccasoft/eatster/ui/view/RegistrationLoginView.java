@@ -33,12 +33,12 @@ public class RegistrationLoginView extends VerticalLayout
         {
 
     private static final Logger LOG = Logger.getLogger(RegistrationLoginView.class);
-    private static final long serialVersionUID = 1L;
     public static final String NAME = "reglogin";
 
 //    private static final int GEN_PASSWORD_LENGTH = 8;
     private static final float WIDTH_FIELD = 15;
     private static final float WIDTH_BUTTON = 5f;
+    private static final long serialVersionUID = 5999771014679336052L;
 
     private final TextField name = new TextField("e-mail");
     private final PasswordField password = new PasswordField("Пароль");

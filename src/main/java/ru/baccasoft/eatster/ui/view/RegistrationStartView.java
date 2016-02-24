@@ -38,12 +38,12 @@ public class RegistrationStartView extends VerticalLayout
         Button.ClickListener {
 
     private static final Logger LOG = Logger.getLogger(RegistrationStartView.class);
-    private static final long serialVersionUID = 1L;
     public static final String NAME = "regstart";
 
     private static final float WIDTH_LABEL = 4f;
     private static final float WIDTH_FIELD = 15;
     private static final float WIDTH_BUTTON = 5f;
+    private static final long serialVersionUID = -3696143312458430796L;
 
     private class PartnerFields extends Object {
 
@@ -153,11 +153,14 @@ public class RegistrationStartView extends VerticalLayout
         //
         fields.name.setRequired(true);
         fields.name.setRequiredError("Не заполнено поле Основной e-mail");
+        fields.name.setValidationVisible(false);
         fields.contactName.setRequired(true);
         fields.contactName.setRequiredError("Не заполнено поле ФИО");
+        fields.contactName.setValidationVisible(false);
         fields.contactPhone.setRequired(true);
         fields.contactPhone.setRequiredError("Не заполнено поле Моб. телефон");
         fields.contactPhone.setValue(EatsterPhoneField.DEFAULT_VALUE);
+        fields.contactPhone.setValidationVisible(false);
     }
 
     public void validate() {

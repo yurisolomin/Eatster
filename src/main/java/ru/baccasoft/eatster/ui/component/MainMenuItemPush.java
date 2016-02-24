@@ -16,10 +16,10 @@ import ru.baccasoft.eatster.service.PushTokenService;
 import ru.baccasoft.eatster.ui.AppUI;
 import ru.baccasoft.utils.logging.Logger;
 
-public class PushPanel extends VerticalLayout implements Button.ClickListener {
-    private static final Logger LOG = Logger.getLogger(PushPanel.class);
+public class MainMenuItemPush extends MainMenuItemLayout implements Button.ClickListener {
+    private static final Logger LOG = Logger.getLogger(MainMenuItemPush.class);
+    private static final long serialVersionUID = -8119150855564726922L;
 
-    private static final long serialVersionUID = 1L;
 
     private final int MESSAGE_MAX_LENGTH = 100;
     private final TextField fieldMessage = new TextField();
@@ -38,12 +38,10 @@ public class PushPanel extends VerticalLayout implements Button.ClickListener {
 
     private Future<Boolean> pushProccess = null;
 
-    PushService pushService;
-    PushTokenService pushTokenService;
+//    PushService pushService;
+//    PushTokenService pushTokenService;
 
-    public PushPanel(PushService pushService, PushTokenService pushTokenService) {
-        this.pushService = pushService;
-        this.pushTokenService = pushTokenService;
+    public MainMenuItemPush() {
         buildLayout();
     }
 
@@ -105,6 +103,7 @@ public class PushPanel extends VerticalLayout implements Button.ClickListener {
         } else {
             layoutStatus.addComponent(new Label(STATUS_IS_RUNNING));
         }
+        PushService pushService = getUI().getPushService();
         int iTotal = pushService.getAsyncIOSKeysTotal();
         int aTotal = pushService.getAsyncAndroidKeysTotal();
         int tTotal = iTotal+aTotal;
@@ -143,6 +142,7 @@ public class PushPanel extends VerticalLayout implements Button.ClickListener {
                 return false;
             }
         }
+        PushService pushService = getUI().getPushService();
         return !pushService.isAsyncPushRunning();
     }
 
@@ -160,10 +160,12 @@ public class PushPanel extends VerticalLayout implements Button.ClickListener {
             Notification.show("Не могу отправить  уведомление, так как длина сообщения превышает "+MESSAGE_MAX_LENGTH+" знаков.", Notification.Type.WARNING_MESSAGE);
             return;
         }
+        PushTokenService pushTokenService = getUI().getPushTokenService();
         List<PushTokenModel> pushTokens = pushTokenService.findAll();
         //дело в том, что spring не сразу обращается в запуска асинхронного процесса и поэтому показатели
         //предыдущего выполнения пока не пустые на выходе после asyncPush
         //поэтому мы их сами почистим перед запуском 
+        PushService pushService = getUI().getPushService();
         pushService.asyncPushClearIndicators();
         pushProccess = pushService.asyncPush(message, pushTokens);
         refresh();
@@ -177,6 +179,11 @@ public class PushPanel extends VerticalLayout implements Button.ClickListener {
         if (event.getButton() == buttonRefresh) {
             refresh();
         }
+    }
+
+    @Override
+    public void doRefresh() {
+        refresh();
     }
 
 }

@@ -1,3 +1,4 @@
+d:
 cd \Java\Eatster\eatster\src\main\scripts
 rem copy /A 0*.sql createAll.sql
 if exist createAll.sql del createAll.sql

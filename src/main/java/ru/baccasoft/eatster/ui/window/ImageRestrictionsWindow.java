@@ -9,8 +9,8 @@ import com.vaadin.ui.Window;
 import ru.baccasoft.eatster.image.ImageValidator;
 
 public class ImageRestrictionsWindow extends Window implements Button.ClickListener {
-    
-    private static final long serialVersionUID = 1L;
+
+    private static final long serialVersionUID = 4527200223449746825L;
 
     private Button buttonOk;
     

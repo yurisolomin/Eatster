@@ -41,8 +41,8 @@ public class RegistrationCompleteView extends VerticalLayout
         Button.ClickListener {
 
     private static final Logger LOG = Logger.getLogger(RegistrationCompleteView.class);
-    private static final long serialVersionUID = 1L;
     public static final String NAME = "regcomplete";
+    private static final long serialVersionUID = 7200145200672873713L;
 
     private RestaurantInformationPanel informationPanel;
     private final CheckBox agreeCheckbox = new CheckBox("Я согласен с договором на оказание услуг");
@@ -80,7 +80,7 @@ public class RegistrationCompleteView extends VerticalLayout
         vLayout.addComponent(label);
         vLayout.setComponentAlignment(label, Alignment.TOP_CENTER);
 
-        informationPanel = new RestaurantInformationPanel(photoService);
+        informationPanel = new RestaurantInformationPanel();
         informationPanel.setSizeUndefined();
         vLayout.addComponent(informationPanel);
         vLayout.setComponentAlignment(informationPanel, Alignment.TOP_CENTER);

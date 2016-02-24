@@ -443,7 +443,8 @@ public class RestaurantService {
         LOG.debug("registrationItem. item={0}",item);
         long insertedId = insertItem(item);
         LOG.debug("insertedId={0}",insertedId);
-        if (!mailService.send(partnerEMail,"Регистрация на Eatster","Ваша регистрация прошла успешно.")) {
+//        if (!mailService.send(partnerEMail,"Регистрация на Eatster","Ваша регистрация прошла успешно.")) {
+        if (!mailService.sendDetailsOnRestaurantRegistration(partnerEMail)) {
             LOG.debug("Fail. Mail not sent.");
             throw new RuntimeException("Error on restaurant registration!");
         }

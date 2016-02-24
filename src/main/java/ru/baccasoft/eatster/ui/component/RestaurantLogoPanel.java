@@ -19,8 +19,7 @@ public class RestaurantLogoPanel extends VerticalLayout
         Button.ClickListener,
         ConfirmDialog.Listener
         {
-
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 6634064290434987579L;
 
     private static final String MESSAGE_DELETE_CONFIRM = "Вы уверены, что хотите удалить логотип ?";
     private static final float WIDTH_IMAGE_DEFAULT = 3.1f;

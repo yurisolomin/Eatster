@@ -17,6 +17,8 @@ public class SMSService {
     private static final Logger LOG = Logger.getLogger(SMSService.class);
     private static final String PROVIDER_WEBSMS = "websms";
     private static final String PROVIDER_ATOMPARK = "atompark";
+    private static final boolean SKIP_SMS = false;
+            
     @Autowired
     AppProp appProp;
     
@@ -89,6 +91,10 @@ public class SMSService {
     
     public boolean sendSMS(String phone,String text) {
         LOG.debug("sendSMS: phone={0}, text={1}",phone,text);
+        if (SKIP_SMS) {
+            LOG.debug("Ok. SKIP_SMS=true. Cancel");
+            return true;
+        }
         String pattern = "\\+\\d{11}";
         if (!phone.matches(pattern)) {
             LOG.debug("Fail. Phone {0} not matches with pattern {1}",phone,pattern);

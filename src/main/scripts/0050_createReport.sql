@@ -7,10 +7,10 @@ CREATE TABLE report (
     report_month int NOT NULL,
     scores_total int NOT NULL,
     scores_spent int NOT NULL,
-    scores_balance int NOT NULL,
     oper_count int NOT NULL,
     check_sum int NOT NULL,
-    status character varying(20) NOT NULL
+    status character varying(20) NOT NULL,
+    commission_sum int NOT NULL
 );
 --in a formation stage
 create unique index ndx_report_restaurant_id on report (restaurant_id,report_year,report_month);

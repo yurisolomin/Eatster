@@ -2,18 +2,18 @@ package ru.baccasoft.eatster.model;
 
 public class OperationTotalModel extends CommonModel {
 
-    Integer scoresTotal;
-    Integer scoresSpent;
-    Integer scoresBalance;
-    Integer operCount;
-    Integer operSum;
+    private Integer scoresTotal;
+    private Integer scoresSpent;
+    private Integer operCount;
+    private Integer operSum;
+    private Integer commissionSum;
 
     public OperationTotalModel() {
         scoresTotal = null;
         scoresSpent = null;
-        scoresBalance = null;
         operCount = null;
         operSum = null;
+        commissionSum = null;
     }
 
     public Integer getScoresTotal() {
@@ -47,12 +47,33 @@ public class OperationTotalModel extends CommonModel {
     public void setOperSum(Integer operSum) {
         this.operSum = operSum;
     }
-
-    public Integer getScoresBalance() {
-        return scoresBalance;
+    
+    public Integer getCommissionSum() {
+        return commissionSum;
     }
 
-    public void setScoresBalance(Integer scoresBalance) {
-        this.scoresBalance = scoresBalance;
+    public void setCommissionSum(Integer commissionSum) {
+        this.commissionSum = commissionSum;
+    }
+
+    public Integer getCalcScoresBalance() {
+        if (getScoresTotal() == null || getScoresSpent() == null) {
+            return null;
+        }
+        return getScoresTotal()-getScoresSpent();
+    }
+
+    public Integer getCalcIncomeSum() {
+        if (getCommissionSum() == null || getScoresTotal() == null) {
+            return null;
+        }
+        return getCommissionSum() - getScoresTotal();
+    }
+
+    public Integer getCalcPayOffBalance() {
+        if (getCommissionSum() == null || getScoresSpent() == null) {
+            return null;
+        }
+        return getCommissionSum() - getScoresSpent();
     }
 }

@@ -14,7 +14,6 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.VerticalLayout;
 import ru.baccasoft.eatster.model.RestaurantModel;
 import ru.baccasoft.eatster.ui.AppUI;
-import ru.baccasoft.eatster.ui.event.Logout_Event;
 import ru.baccasoft.eatster.ui.event.RestaurantChange_Event;
 import ru.baccasoft.eatster.ui.event.ShowAction_Event;
 import ru.baccasoft.eatster.ui.event.ShowInformation_Event;
@@ -25,14 +24,13 @@ import ru.baccasoft.eatster.ui.event.ShowWaiter_Event;
 import ru.baccasoft.eatster.ui.scope.PartnerScope;
 
 public class RestaurantHeaderPanel extends VerticalLayout {
-
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -8409233094945080631L;
     
     private static final int WIDTH_FIELD = 11;
     private static final float WIDTH_BUTTON = 4.5f;
     private class Fields {
         private final ComboBox id = new EatsterIdComboBox(null,"");
-        private final ComboBox status = new ComboBox();
+        private final ComboBox status = new EatsterStatusComboBox(null);
 
         public Fields() {
             id.setWidth(WIDTH_FIELD, Unit.CM);
@@ -50,7 +48,6 @@ public class RestaurantHeaderPanel extends VerticalLayout {
     private final Button btnOperation = new Button("Операции / Оплата");
     private final Button btnPartner = new Button("Настройки");
     private Property.ValueChangeListener idValueChangeListener;
-    //private final Button btnLogout = new Button("Log out");
     
     private final Fields fields = new Fields();
     private BeanFieldGroup<RestaurantModel> fieldBindings;
@@ -61,9 +58,6 @@ public class RestaurantHeaderPanel extends VerticalLayout {
     
     public final void buildLayout() {
         setSpacing(true);
-        //
-//        Layout logoutLayout = buildLogoutLayout();
-//        addComponent(logoutLayout);
         //
         Layout restaurantLayout = buildRestaurantLayout();
         Layout buttonLayout = buildButtonsLayout();
@@ -86,8 +80,6 @@ public class RestaurantHeaderPanel extends VerticalLayout {
         grid.setComponentAlignment(labStatus, Alignment.TOP_LEFT);
         grid.addComponent(fields.status, 1, 1);
         grid.setComponentAlignment(fields.status, Alignment.TOP_LEFT);
-        //labRest.setWidth("170");
-        //labStatus.setWidth("170px");
 
         // реакция на смену ресторана
         idValueChangeListener = new Property.ValueChangeListener() {
@@ -125,14 +117,15 @@ public class RestaurantHeaderPanel extends VerticalLayout {
         fields.status.setEnabled(false);
 
         btnAction.addClickListener(new Button.ClickListener() {
+            private static final long serialVersionUID = 5019806363620874205L;
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 getUI().fire(new ShowAction_Event());
-//                getUI().fire(new SwitchView_Event(ActionView.NAME));
             }
         });
 
         btnInformation.addClickListener(new Button.ClickListener() {
+            private static final long serialVersionUID = 5019806363620874205L;
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 getUI().fire(new ShowInformation_Event());
@@ -140,6 +133,7 @@ public class RestaurantHeaderPanel extends VerticalLayout {
         });
         
         btnPartner.addClickListener(new Button.ClickListener() {
+            private static final long serialVersionUID = 5019806363620874205L;
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 getUI().fire(new ShowPartner_Event());
@@ -147,6 +141,7 @@ public class RestaurantHeaderPanel extends VerticalLayout {
         });
         
         btnOperation.addClickListener(new Button.ClickListener() {
+            private static final long serialVersionUID = 5019806363620874205L;
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 getUI().fire(new ShowOperation_Event());
@@ -154,6 +149,7 @@ public class RestaurantHeaderPanel extends VerticalLayout {
         });
         
         btnWaiter.addClickListener(new Button.ClickListener() {
+            private static final long serialVersionUID = 5019806363620874205L;
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 getUI().fire(new ShowWaiter_Event());
@@ -161,6 +157,7 @@ public class RestaurantHeaderPanel extends VerticalLayout {
         });
         
         btnPhoto.addClickListener(new Button.ClickListener() {
+            private static final long serialVersionUID = 5019806363620874205L;
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 getUI().fire(new ShowPhoto_Event());
@@ -169,20 +166,7 @@ public class RestaurantHeaderPanel extends VerticalLayout {
         
         return grid;
     }
-/*
-    public final Layout buildLogoutLayout() {
-        VerticalLayout layout = new VerticalLayout(btnLogout);
-        layout.setComponentAlignment(btnLogout, Alignment.TOP_RIGHT);
-
-        btnLogout.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                getUI().fire(new Logout_Event());
-            }
-        });
-        return layout;
-    }
-*/    
+    
     @Override
     public AppUI getUI() {
         return (AppUI) super.getUI();

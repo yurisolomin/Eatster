@@ -6,18 +6,18 @@ public class OperationReportModel extends CommonModel {
     private String restaurantName;
     private int scoresTotal;
     private int scoresSpent;
-    private int scoresBalance;
     private int operCount;
     private int checkSum;
+    private int commissionSum;
 
     public OperationReportModel() {
         scoresTotal = 0;
         scoresSpent = 0;
-        scoresBalance = 0;
         operCount = 0;
         restaurantId = 0;
         restaurantName = "";
         checkSum = 0;
+        commissionSum = 0;
     }
 
     public int getScoresTotal() {
@@ -44,14 +44,6 @@ public class OperationReportModel extends CommonModel {
         this.operCount = operCount;
     }
 
-    public int getScoresBalance() {
-        return scoresBalance;
-    }
-
-    public void setScoresBalance(int scoresBalance) {
-        this.scoresBalance = scoresBalance;
-    }
-
     public long getRestaurantId() {
         return restaurantId;
     }
@@ -75,5 +67,25 @@ public class OperationReportModel extends CommonModel {
     public void setCheckSum(int checkSum) {
         this.checkSum = checkSum;
     }
-    
+
+    public int getCommissionSum() {
+        return commissionSum;
+    }
+
+    public void setCommissionSum(int commissionSum) {
+        this.commissionSum = commissionSum;
+    }
+
+    public int getCalcScoresBalance() {
+        return getScoresTotal()-getScoresSpent();
+    }
+
+    public int getCalcIncomeSum() {
+        return getCommissionSum() - getScoresTotal();
+    }
+
+    public int getCalcPayOffBalance() {
+        return getCommissionSum() - getScoresSpent();
+    }
+
 }

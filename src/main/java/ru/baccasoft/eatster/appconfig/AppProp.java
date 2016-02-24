@@ -21,7 +21,6 @@ public class AppProp {
     private static final Logger LOG = Logger.getLogger(AppProp.class);
 
     public AppProp() {
-        LOG.debug("AppProp.create!");
     }
 
     public String getProperty(String name) {
@@ -100,6 +99,9 @@ public class AppProp {
     public String getTransferReceiverAccount() {
         return getPropertyDef("transfer.receiver.account","");
     }
+    public String getTransferReceiverOGRN() {
+        return getPropertyDef("transfer.receiver.OGRN","");
+    }
     public String getTransferBankName() {
         return getPropertyDef("transfer.bank.name","");
     }
@@ -110,19 +112,22 @@ public class AppProp {
         return getPropertyDef("transfer.bank.account","");
     }
     
-    public double getCashbackBaseRate() {
-        return getPropertyFloat("cashback.base.rate");
+    public int getCashbackBaseRate() {
+        return getPropertyInt("cashback.base.rate");
     }
-    public double getCashbackBonusRate() {
-        return getPropertyFloat("cashback.bonus.rate");
+    public int getCashbackBonusRate() {
+        return getPropertyInt("cashback.bonus.rate");
     }
     public int getCashbackPeriodLength() {
         return getPropertyInt("cashback.period.length");
     }
-        
-    public boolean isShowLogins() {
-        return getPropertyBoolean("show.logins");
+    public int getCashbackMinimum() {
+        return getPropertyInt("cashback.minimum");
     }
+    
+//    public boolean isShowLogins() {
+//        return getPropertyBoolean("show.logins");
+//    }
     
     public String getContractUrl() {
         return getProperty("contract.url");
@@ -132,6 +137,9 @@ public class AppProp {
         return getProperty("support.email");
     }
     
+    public String getSupportPhone() {
+        return getProperty("support.phone");
+    }
 
     public String getClubEatsterRestaurantName() {
         return getProperty("club.eatster.restaurant.name");
@@ -167,6 +175,44 @@ public class AppProp {
 
     public String getNotificationEmail() {
         return getProperty("notification.email");
+    }
+
+    public String getManagerName() {
+        return getProperty("manager.name");
+    }
+    public String getManagerEmail() {
+        return getProperty("manager.email");
+    }
+    public String getManagerPhone() {
+        return getProperty("manager.phone");
+    }
+    public boolean isButtonSendReports() {
+        return getPropertyBoolean("button.send.reports");
+    }
+    
+    public String getHelpUrl() {
+        return getProperty("help.url");
+    }
+    public String getIdeasUrl() {
+        return getProperty("ideas.url");
+    }
+
+    public String getFinanceTeamEmail() {
+        return getProperty("finance.team.email");
+    }
+    public String getFinanceTeamPhone() {
+        return getProperty("finance.team.phone");
+    }
+    
+    public int getUserLimitRegistrationCount() {
+        return getPropertyInt("user.limit.registration.count");
+    }
+    public int getUserLimitRegistrationInterval() {
+        return getPropertyInt("user.limit.registration.interval");
+    }
+
+    public int getCommissionRate() {
+        return getPropertyInt("commission.rate");
     }
 
 }

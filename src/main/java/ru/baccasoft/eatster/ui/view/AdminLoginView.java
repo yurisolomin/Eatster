@@ -25,21 +25,17 @@ import ru.baccasoft.eatster.service.PartnerService;
 import ru.baccasoft.eatster.ui.AppUI;
 import ru.baccasoft.eatster.ui.event.LoginSuccess_Event;
 import ru.baccasoft.eatster.ui.util.LoginHelper;
-import ru.baccasoft.utils.logging.Logger;
 
 @UIScope
 @SpringView(name = AdminLoginView.NAME)
 public class AdminLoginView extends VerticalLayout implements View, Button.ClickListener {
-
-    private static final Logger LOG = Logger.getLogger(AdminLoginView.class);
-
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -313351789295951193L;
     public static final String NAME = "alogin";
     private static final float WIDTH_FIELD = 10f;
     private static final float WIDTH_BUTTON = 5f;
 
-    private TextField user;
-    private PasswordField password;
+    private TextField adminUser;
+    private PasswordField adminPassword;
     private Button loginButton;
     private LoginHelper loginHelper;
 
@@ -55,15 +51,15 @@ public class AdminLoginView extends VerticalLayout implements View, Button.Click
     void init() {
         loginHelper = new LoginHelper(appProp.getLoginAttemptsInMinute());
         setSizeFull();
-        user = new TextField("Администратор:");
-        user.setWidth(WIDTH_FIELD,Unit.CM);
-        user.setRequired(true);
+        adminUser = new TextField("Администратор:");
+        adminUser.setWidth(WIDTH_FIELD,Unit.CM);
+        adminUser.setRequired(true);
         //user.setInputPrompt("Имя пользователя");
-        password = new PasswordField("Пароль:");
-        password.setWidth(WIDTH_FIELD,Unit.CM);
-        password.addValidator(new PasswordValidator());
-        password.setRequired(true);
-        password.setNullRepresentation("");
+        adminPassword = new PasswordField("Пароль:");
+        adminPassword.setWidth(WIDTH_FIELD,Unit.CM);
+        adminPassword.addValidator(new PasswordValidator());
+        adminPassword.setRequired(true);
+        adminPassword.setNullRepresentation("");
 
         // Create login button
         loginButton = new Button("Войти", this);
@@ -74,6 +70,7 @@ public class AdminLoginView extends VerticalLayout implements View, Button.Click
         //покажем три патнера для отладки--------------------------
         String defaultLogin = "";
         String defaultPassword = "";
+/*        
         List<PartnerModel> listPartner = partnerService.findAll();
         if (!appProp.isShowLogins()) {
             listPartner.clear();
@@ -92,11 +89,12 @@ public class AdminLoginView extends VerticalLayout implements View, Button.Click
                 defaultPassword = r.getPassword();
             }
         }
-        user.setValue(defaultLogin);
-        password.setValue(defaultPassword);
+*/
+        adminUser.setValue(defaultLogin);
+        adminPassword.setValue(defaultPassword);
         //
-        fields.addComponent(user);
-        fields.addComponent(password);
+        fields.addComponent(adminUser);
+        fields.addComponent(adminPassword);
         //fields.addComponent(loginButton);
         fields.setCaption("Для входа в административную панель пройдите авторизацию:");
         fields.setSpacing(true);
@@ -125,33 +123,35 @@ public class AdminLoginView extends VerticalLayout implements View, Button.Click
 
     @Override
     public void buttonClick(Button.ClickEvent event) {
-        if (!user.isValid() || !password.isValid()) {
+        if (!adminUser.isValid() || !adminPassword.isValid()) {
             return;
         }
         if (!loginHelper.isLoginEnabled()) {
             Notification.show(LoginHelper.WARN_MESSAGE, Notification.Type.WARNING_MESSAGE);
             return;
         }
-        PartnerModel partnerModel = partnerService.authAdmin(user.getValue(), password.getValue());
+        PartnerModel partnerModel = partnerService.authAdmin(adminUser.getValue(), adminPassword.getValue());
         if (partnerModel != null) {
             loginHelper.clearAttempts();
-            this.user.setComponentError(null);
-            this.password.setComponentError(null);
+            this.adminUser.setComponentError(null);
+            this.adminPassword.setComponentError(null);
             // TODO Auto-generated method stub
             Notification.show("Успешно", "Авторизация прошла успешно", Notification.Type.TRAY_NOTIFICATION);
             getUI().fire(new LoginSuccess_Event(partnerModel));
         } else {
             // Wrong password clear the password field and refocuses it
-            this.password.setValue(null);
+            this.adminPassword.setValue(null);
             String wrongMessage = "Неверные имя администратора или пароль";
-            this.password.focus();
-            this.user.setComponentError(new UserError(wrongMessage));
-            this.password.setComponentError(new UserError(wrongMessage));
+            this.adminPassword.focus();
+            this.adminUser.setComponentError(new UserError(wrongMessage));
+            this.adminPassword.setComponentError(new UserError(wrongMessage));
             Notification.show(wrongMessage, Notification.Type.HUMANIZED_MESSAGE);
         }
     }
 
     private static final class PasswordValidator extends AbstractValidator<String> {
+
+        private static final long serialVersionUID = 7084788179429323671L;
 
         public PasswordValidator() {
             super("The password provided is not valid");

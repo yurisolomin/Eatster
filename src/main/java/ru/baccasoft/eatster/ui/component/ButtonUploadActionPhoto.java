@@ -6,7 +6,7 @@ import ru.baccasoft.eatster.ui.event.ActionPhotoUploaded_Event;
 
 public class ButtonUploadActionPhoto extends UploadField {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -3418849071939626313L;
 
     ActionPanel actionPanel;
 

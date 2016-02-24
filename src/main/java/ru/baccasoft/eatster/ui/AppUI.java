@@ -26,12 +26,20 @@ import ru.baccasoft.eatster.appconfig.AppProp;
 import ru.baccasoft.eatster.model.PartnerModel;
 import ru.baccasoft.eatster.model.RestaurantModel;
 import ru.baccasoft.eatster.model.WaiterModel;
+import ru.baccasoft.eatster.service.ActionService;
 import ru.baccasoft.eatster.service.MailService;
+import ru.baccasoft.eatster.service.OperationReportService;
 import ru.baccasoft.eatster.service.OperationService;
 import ru.baccasoft.eatster.service.OperationTotalService;
+import ru.baccasoft.eatster.service.PartnerService;
+import ru.baccasoft.eatster.service.PhotoService;
+import ru.baccasoft.eatster.service.PushService;
+import ru.baccasoft.eatster.service.PushTokenService;
 import ru.baccasoft.eatster.service.ReportService;
 import ru.baccasoft.eatster.service.RestaurantService;
-import ru.baccasoft.eatster.ui.component.RestaurantPanel;
+import ru.baccasoft.eatster.service.UserReportService;
+import ru.baccasoft.eatster.service.UserSMSService;
+import ru.baccasoft.eatster.service.WaiterService;
 import ru.baccasoft.eatster.ui.window.RestaurantNoActiveWindow;
 import ru.baccasoft.eatster.ui.event.ActionDelete_Event;
 import ru.baccasoft.eatster.ui.event.ActionDelete_Listener;
@@ -133,8 +141,6 @@ public class AppUI extends UI
     @Autowired
     private AppProp appProp;
 
-//    @Autowired
-//    private LoginView loginView;
     @Autowired
     private MainView mainView;
     @Autowired
@@ -149,10 +155,26 @@ public class AppUI extends UI
     OperationService operationService;
     @Autowired
     ReportService reportService;
+    @Autowired
+    UserSMSService userSMSService;
+    @Autowired
+    WaiterService waiterService;
+    @Autowired
+    PartnerService partnerService;
+    @Autowired
+    ActionService actionService;
+    @Autowired
+    PhotoService photoService;
+    @Autowired
+    OperationReportService operationReportService;
+    @Autowired
+    UserReportService userReportService;
+    @Autowired
+    PushService pushService;
+    @Autowired
+    PushTokenService pushTokenService;
 
     @WebServlet(
-            //            value = "/*", 
-            //            value = {"/admin/*", "/waiter/*", "/VAADIN/*"},
             value = {"/partner/*", "/waiter/*", "/admin/*", "/VAADIN/*"},
             asyncSupported = true,
             initParams = {
@@ -214,26 +236,6 @@ public class AppUI extends UI
         return blackboard;
     }
 
-    /*
-    private void initGuestUser() {
-        partnerModel = null;
-        waiterModel = null;
-        appType = null;
-        String location = getPage().getLocation().getPath();
-        if (location.endsWith("/partner")) {
-            appType = AppType.APP_PARTNER;
-            navigator.navigateTo(PartnerLoginView.NAME);
-        }
-        if (location.endsWith("/waiter")) {
-            appType = AppType.APP_WAITER;
-            navigator.navigateTo(WaiterLoginView.NAME);
-        }
-        if (location.endsWith("/admin")) {
-            appType = AppType.APP_ADMIN;
-            navigator.navigateTo(AdminLoginView.NAME);
-        }
-    }
-     */
     private void initGuestUser() {
         partnerModel = null;
         waiterModel = null;
@@ -335,6 +337,15 @@ public class AppUI extends UI
                 addWindow(new RestaurantNoActiveWindow(topRestaurant.getName()));
             }
         }
+/*        
+        UserSMSModel u = new UserSMSModel();
+        u.setPhone("+79053632154");
+        u.setText("1234");
+        userSMSService.insertItem(u);
+        List<UserSMSModel> l = userSMSService.findByPhone("+79053632154",2);
+        LOG.debug("size={0}",l.size());
+        LOG.debug("item={0}",l.get(0));
+*/        
         LOG.debug("Ok.");
     }
 
@@ -414,22 +425,73 @@ public class AppUI extends UI
         return reportService;
     }
 
+    
+/*  FIXME захожу в админку, выход, логин партнерки, опять админка - getUI()=null ?!
+    пока не знаю, что с этим делать*/
     @Override
     public void refresh(VaadinRequest request) {
         super.refresh(request);
         LOG.debug("refresh:");
-        if (isAdminApp() ) {
-            LOG.debug("Reload comobobox lists for partner/admin");
-            List<RestaurantModel> listRestaurant = restaurantService.findAll();
-            //подтянем справочники для выпадающих списков
-            partnerScope.init(listRestaurant);
-            RestaurantPanel restaurantPanel = mainView.getRestaurantPanel();
-            restaurantPanel.refreshComboBox();
-            long restaurantId = restaurantPanel.getSelectedRestaurantId();
-            RestaurantModel restaurantModel = restaurantService.getItem(restaurantId);
-            restaurantPanel.setRestaurantModel(restaurantModel);
-            restaurantPanel.refreshRestaurantPanel();
+        if (!isAdminApp() && !isPartnerApp()) {
+            LOG.debug("Skip refresh. No admin/partner app");
+            return;
         }
+        if (mainView.getUI() == null) {
+            LOG.debug("Skip refresh. mainView.getUI() = null");
+            return;
+        }
+        LOG.debug("Reload admin/partner data");
+        //обновим данные партнера/админа
+        long partnerId = partnerModel.getId();
+        partnerModel = partnerService.getItem(partnerId);
+        LOG.debug("admin/partner={0}",partnerModel);
+        //список доступных ресторанов
+        List<RestaurantModel> listRestaurant;
+        if (partnerModel.isAdmin()) {
+            listRestaurant = restaurantService.findAll();
+        } else {
+            listRestaurant = restaurantService.findByPartner(partnerModel.getId());
+        }
+        //подтянем справочники для выпадающих списков
+        partnerScope.init(listRestaurant);
+        mainView.doExternalRefresh();
         LOG.debug("Ok.");
+    }
+
+
+    public WaiterService getWaiterService() {
+        return waiterService;
+    }
+
+    public ActionService getActionService() {
+        return actionService;
+    }
+
+    public PhotoService getPhotoService() {
+        return photoService;
+    }
+
+    public RestaurantService getRestaurantService() {
+        return restaurantService;
+    }
+
+    public PartnerService getPartnerService() {
+        return partnerService;
+    }
+
+    public OperationReportService getOperationReportService() {
+        return operationReportService;
+    }
+
+    public UserReportService getUserReportService() {
+        return userReportService;
+    }
+
+    public PushService getPushService() {
+        return pushService;
+    }
+
+    public PushTokenService getPushTokenService() {
+        return pushTokenService;
     }
 }

@@ -85,35 +85,46 @@ public class PartnerScope {
         comboBox.setItemCaption(itemId, itemName);
     }
 
-    
     public void comboboxForCuisine(ComboBox comboBox) {
+        boolean readOnly = comboBox.isReadOnly();
+        comboBox.setReadOnly(false);
         comboBox.removeAllItems();
         for (CommonNamedModel item : listCuisine) {
             comboboxAddItem(comboBox, item);
         }
+        comboBox.setReadOnly(readOnly);
     }
     
     public void comboboxForSubway(ComboBox comboBox) {
+        boolean readOnly = comboBox.isReadOnly();
+        comboBox.setReadOnly(false);
         comboBox.removeAllItems();
         for (CommonNamedModel item : listSubway) {
             comboboxAddItem(comboBox, item);
         }
+        comboBox.setReadOnly(readOnly);
     }
     
     public void comboboxForParking(ComboBox comboBox) {
+        boolean readOnly = comboBox.isReadOnly();
+        comboBox.setReadOnly(false);
         comboBox.removeAllItems();
         for (CommonNamedModel item : listParking) {
             comboboxAddItem(comboBox, item);
         }
+        comboBox.setReadOnly(readOnly);
     }
 
     public void comboboxForAverageCheck(ComboBox comboBox) {
+        boolean readOnly = comboBox.isReadOnly();
+        comboBox.setReadOnly(false);
         comboBox.removeAllItems();
         for (CommonNamedModel item : listAverageCheck) {
             comboboxAddItem(comboBox, item);
         }
+        comboBox.setReadOnly(readOnly);
     }
-
+/*
     public void comboboxForAvailable(ComboBox comboBox) {
         comboBox.removeAllItems();
         comboBox.addItem(true);
@@ -129,7 +140,7 @@ public class PartnerScope {
             comboBox.addItem(String.format("%02d:30", h));
         }
     }
-
+*/
     public void comboboxForActionStatus(ComboBox comboBox) {
         comboBox.removeAllItems();
         for (ActionModel.ActionStatus item : ActionModel.getStatusList()) {

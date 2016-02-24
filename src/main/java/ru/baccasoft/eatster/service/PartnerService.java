@@ -278,7 +278,8 @@ public class PartnerService {
         partnerModel.setAdmin(false);
         partnerModel.setPassword(password);
         long insertedId = insertItem(partnerModel);
-        if (!mailService.send(partnerModel.getName(),"Регистрация на Eatster","Ваш пароль "+password)) {
+//        if (!mailService.send(partnerModel.getName(),"Регистрация на Eatster","Ваш пароль "+password)) {
+        if (!mailService.sendPasswordOnPartnerRegistration(partnerModel.getName(),password)) {
             LOG.warn("Fail. Mail not sent.");
             throw new RuntimeException("Error on partner registration!");
         
@@ -286,14 +287,17 @@ public class PartnerService {
         //отправить уведомление о регистрации ресторана
         String notificationEmail = appProp.getNotificationEmail();
         if (!notificationEmail.equals("")) {
-            String contactData = "E-mail регистрации: "+partnerModel.getName()
-                        +". Контактные данные:"
-                        +" ФИО "+partnerModel.getContactName()
-                        +", телефон "+partnerModel.getContactPhone();
-            if (!mailService.send(notificationEmail,"Регистрация на Eatster нового ресторана",contactData)) {
+            String contactData = "E-mail регистрации: "+partnerModel.getName()+"\n"
+                        +"Контактные данные:"+"\n"
+                        +"Ф.И.О. "+partnerModel.getContactName()+"\n"
+                        +"Телефон "+partnerModel.getContactPhone();
+            if (!mailService.send(notificationEmail,"Регистрация нового ресторана в EatAction",
+                    "В EatAction регистрируется новый ресторан.\n\n"+contactData)) {
                 LOG.warn("Fail. Mail not sent.");
                 throw new RuntimeException("Error on partner registration!");
             }
+        } else {
+            LOG.warn("NotificationEmail is empty. Skiped notification");
         }
         LOG.debug("Ok.");
         return insertedId;

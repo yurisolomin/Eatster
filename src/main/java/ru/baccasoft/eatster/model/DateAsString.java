@@ -77,6 +77,13 @@ public class DateAsString {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         return formatter.format(date);
     }
+    public String toString(Date date, String format) {
+        if (isEmpty(date)) {
+            return "";
+        }
+        SimpleDateFormat formatter = new SimpleDateFormat(format);
+        return formatter.format(date);
+    }
 
     public Date curDate() {
         return new Date();

@@ -4,8 +4,8 @@ package ru.baccasoft.eatster.ui.component;
 import com.vaadin.ui.PasswordField;
 
 public class WPasswordField extends PasswordField {
-    
-    private static final long serialVersionUID = 1L;
+
+    private static final long serialVersionUID = -3707287525332271977L;
 
     public WPasswordField() {
         super();

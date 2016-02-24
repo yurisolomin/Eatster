@@ -19,10 +19,11 @@ public class OperationTotalService {
     
     private JdbcTemplate jdbc;
     private static final String SQL_SELECT_TOTAL = "select "
-        +" COALESCE( sum(case when score > 0 then score else 0 end), 0) as scores_total,"
-        +" COALESCE( sum(case when score < 0 then -score else 0 end), 0) as scores_spent,"
-        +"  count(*) as oper_count,"
-        +"  COALESCE(sum(check_sum),0) as oper_sum"
+        +" COALESCE( sum(add_score), 0) as scores_total,"
+        +" COALESCE( sum(dec_score), 0) as scores_spent,"
+        +" count(*) as oper_count,"
+        +" COALESCE(sum(check_sum),0) as oper_sum,"
+        +" COALESCE(sum(check_sum * commission_rate / 100),0) as commission_sum"
         +" from operation where status = '"+OperationModel.STATUS_CONFIRMED+"'";
     private static final String SQL_SELECT_TOTAL_BY_REST = SQL_SELECT_TOTAL+" and restaurant_id=?";
     private static final String SQL_SELECT_TOTAL_BY_USER = SQL_SELECT_TOTAL+" and user_id=?";
@@ -42,7 +43,7 @@ public class OperationTotalService {
             item.setScoresSpent(rs.getInt(++index));
             item.setOperCount(rs.getInt(++index));
             item.setOperSum(rs.getInt(++index));
-            item.setScoresBalance(item.getScoresTotal()-item.getScoresSpent());
+            item.setCommissionSum(rs.getInt(++index));
             return item;
         }
     }	

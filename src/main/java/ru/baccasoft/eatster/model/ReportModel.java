@@ -15,12 +15,12 @@ public class ReportModel extends CommonIdModel {
     private String restaurantName;
     private int scoresTotal;
     private int scoresSpent;
-    private int scoresBalance;
     private int operCount;
     private int checkSum;
     private String status;
     private int reportYear;
     private int reportMonth;
+    private int commissionSum;
 
     public static class ReportStatus {
         String id;
@@ -40,7 +40,6 @@ public class ReportModel extends CommonIdModel {
     public ReportModel() {
         scoresTotal = 0;
         scoresSpent = 0;
-        scoresBalance = 0;
         operCount = 0;
         restaurantId = 0;
         restaurantName = "";
@@ -48,6 +47,7 @@ public class ReportModel extends CommonIdModel {
         status = "";
         reportYear = 0;
         reportMonth = 0;
+        commissionSum = 0;
     }
 
     public int getScoresTotal() {
@@ -72,14 +72,6 @@ public class ReportModel extends CommonIdModel {
 
     public void setOperCount(int operCount) {
         this.operCount = operCount;
-    }
-
-    public int getScoresBalance() {
-        return scoresBalance;
-    }
-
-    public void setScoresBalance(int scoresBalance) {
-        this.scoresBalance = scoresBalance;
     }
 
     public long getRestaurantId() {
@@ -128,6 +120,26 @@ public class ReportModel extends CommonIdModel {
 
     public void setReportMonth(int reportMonth) {
         this.reportMonth = reportMonth;
+    }
+
+    public int getCommissionSum() {
+        return commissionSum;
+    }
+
+    public void setCommissionSum(int commissionSum) {
+        this.commissionSum = commissionSum;
+    }
+    
+    public int calcScoresBalance() {
+        return getScoresTotal()-getScoresSpent();
+    }
+
+    public int calcIncomeSum() {
+        return getCommissionSum() - getScoresTotal();
+    }
+
+    public int calcPayOffBalance() {
+        return getCommissionSum() - getScoresSpent();
     }
 
     public String getStatusRus() {

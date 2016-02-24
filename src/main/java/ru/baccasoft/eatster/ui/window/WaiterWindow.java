@@ -24,12 +24,8 @@ import ru.baccasoft.utils.logging.Logger;
 public class WaiterWindow extends Window {
 
     private static final Logger LOG = Logger.getLogger(ActionPanel.class);
-    private static final long serialVersionUID = 1L;
-//    private static final int WIDTH_BUTTON = 3;
+    private static final long serialVersionUID = -5080117752197285325L;
     public enum ActionType { Create, Edit, Delete };
-//    private static final String ACTION_SAVE = "Сохранить";
-//    private static final String CAPTION_ADD = "Добавить";
-//    private static final String CAPTION_DEL = "Удалить";
     
     private class WaiterFields {
         private static final int WIDTH_FIELD = 6;

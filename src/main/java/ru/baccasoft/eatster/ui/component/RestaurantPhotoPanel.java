@@ -31,8 +31,7 @@ public class RestaurantPhotoPanel extends VerticalLayout
         Button.ClickListener,
         ValueChangeListener
         {
-
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -4578193189018252585L;
     private static final Logger LOG = Logger.getLogger(RestaurantPhotoPanel.class);
 
     private static final float WIDTH_STATUS = 4.5f;
@@ -41,7 +40,7 @@ public class RestaurantPhotoPanel extends VerticalLayout
         
     private class PhotoFields {
 
-        ComboBox status = new ComboBox();//
+        ComboBox status = new EatsterStatusComboBox(null);//
         Image image = new Image();
 
         public PhotoFields() {
@@ -174,4 +173,7 @@ public class RestaurantPhotoPanel extends VerticalLayout
         return imageValidator;
     }
     
+    public void setAlternateText(String caption) {
+        fields.image.setAlternateText(caption);
+    }
 }

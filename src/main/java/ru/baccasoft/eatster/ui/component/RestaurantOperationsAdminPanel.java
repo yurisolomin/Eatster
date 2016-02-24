@@ -2,13 +2,10 @@ package ru.baccasoft.eatster.ui.component;
 
 import com.vaadin.addon.tableexport.ExcelExport;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Grid;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -16,27 +13,25 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import ru.baccasoft.eatster.model.OperationModel;
 import ru.baccasoft.eatster.model.OperationTotalModel;
 import ru.baccasoft.eatster.ui.AppUI;
-import ru.baccasoft.eatster.ui.event.ShowAllOperations_Event;
-import ru.baccasoft.utils.logging.Logger;
 
-public class RestaurantOperationsPanel extends VerticalLayout implements Button.ClickListener {
+public class RestaurantOperationsAdminPanel extends VerticalLayout implements Button.ClickListener {
 
-    private static final long serialVersionUID = 1L;
-    private static final Logger LOG = Logger.getLogger(RestaurantOperationsPanel.class);
+    private static final long serialVersionUID = 6586003029054306084L;
 
     private class Fields {
 
-        private static final int WIDTH_FIELD = 4;
+        private static final float WIDTH_FIELD = 3.5f;
         TextField operCount = new TextField();
         TextField operSum = new TextField();
         TextField scoresTotal = new TextField();    //начислено
         TextField scoresSpent = new TextField();    //списано
-        TextField scoresBalance = new TextField();  //баланс
+        TextField calcPayOffBalance = new TextField();    //сальдо выплат
+        TextField calcIncomeSum = new TextField();      //прибыль
+        TextField commissionSum = new TextField();      //комиссия
 
         public Fields() {
             operCount.setWidth(WIDTH_FIELD, Unit.CM);
@@ -47,8 +42,12 @@ public class RestaurantOperationsPanel extends VerticalLayout implements Button.
             scoresTotal.setNullRepresentation("");
             scoresSpent.setWidth(WIDTH_FIELD, Unit.CM);
             scoresSpent.setNullRepresentation("");
-            scoresBalance.setWidth(WIDTH_FIELD, Unit.CM);
-            scoresBalance.setNullRepresentation("");
+            calcPayOffBalance.setWidth(WIDTH_FIELD, Unit.CM);
+            calcPayOffBalance.setNullRepresentation("");
+            calcIncomeSum.setWidth(WIDTH_FIELD, Unit.CM);
+            calcIncomeSum.setNullRepresentation("");
+            commissionSum.setWidth(WIDTH_FIELD, Unit.CM);
+            commissionSum.setNullRepresentation("");
         }
 
     }
@@ -64,46 +63,54 @@ public class RestaurantOperationsPanel extends VerticalLayout implements Button.
     private final Label labelNoData = new Label();
     private final float BUTTON_WIDTH = 4f;
     private final static int FIX_ROW_COUNT = 10;
-    private long restaurantId;
+    private long restaurantId = 0;
 
-    public RestaurantOperationsPanel() {
+    public RestaurantOperationsAdminPanel() {
         buildLayout();
     }
 
-    private void addToGrid(GridLayout grid, int col, int row, Component component, String caption) {
+    private void addToGrid(GridLayout grid, int col, int row, Component component, String caption, Alignment alignment) {
         Label lab = new Label(caption);
+        lab.setWidthUndefined();
         grid.addComponent(lab, col - 1, row);
-        grid.setComponentAlignment(lab, Alignment.TOP_LEFT);
+        grid.setComponentAlignment(lab, alignment);
+        //
         grid.addComponent(component, col, row);
-        grid.setComponentAlignment(component, Alignment.TOP_LEFT);
+        grid.setComponentAlignment(component, alignment);
     }
 
     private void buildLayout() {
         setSpacing(true);
-        HorizontalLayout buttonsLayout = new HorizontalLayout(buttonShowByRestaurant,buttonShowAll);
-        buttonsLayout.setSpacing(true);
-        buttonsLayout.setMargin(new MarginInfo(true,true,false,true));
-        addComponent(buttonsLayout);
-        GridLayout grid = new GridLayout(6, 2);
+        setMargin(new MarginInfo(true,false,false,false));
+        //
+        GridLayout grid = new GridLayout(8, 2);
         grid.setSpacing(true);
-        grid.setMargin(new MarginInfo(false,true,false,true));
-  
-        grid.setSizeFull();
-        addToGrid(grid, 1, 0, fields.operCount, "Всего операций");
-        addToGrid(grid, 1, 1, fields.operSum, "Оборот");
-        addToGrid(grid, 3, 0, fields.scoresTotal, "Начислено баллов");
-        addToGrid(grid, 3, 1, fields.scoresSpent, "Списано баллов");
-        addToGrid(grid, 5, 0, fields.scoresBalance, "Баланс");
-        grid.addComponent(buttonExportToExcel, 5, 1);
-        //buttonExportToExcel.setEnabled(false);
+        //
+        addToGrid(grid, 1, 0, fields.operCount, "Всего транзакций",Alignment.TOP_LEFT);
+        addToGrid(grid, 1, 1, fields.operSum, "Оборот",Alignment.TOP_LEFT);
+        addToGrid(grid, 3, 0, fields.scoresTotal, "Начислено баллов",Alignment.TOP_LEFT);
+        addToGrid(grid, 3, 1, fields.scoresSpent, "Списано баллов",Alignment.TOP_LEFT);
+        addToGrid(grid, 5, 0, fields.commissionSum, "Комиссия EatAction",Alignment.TOP_LEFT);
+        addToGrid(grid, 5, 1, fields.calcPayOffBalance, "Сальдо выплат",Alignment.TOP_LEFT);
+        addToGrid(grid, 7, 0, fields.calcIncomeSum, "Прибыль EatAction",Alignment.TOP_LEFT);
         addComponent(grid);
-        
-        operationsGrid.addContainerProperty("Пользователь", String.class, null);
-        operationsGrid.addContainerProperty("Официант", String.class, null);
+        //
+        HorizontalLayout buttonsLayout = new HorizontalLayout(buttonShowByRestaurant,buttonShowAll,buttonExportToExcel);
+        buttonsLayout.setSpacing(true);
+        addComponent(buttonsLayout);
+        //
         operationsGrid.addContainerProperty("Дата и время", String.class, null);
-        operationsGrid.addContainerProperty("Чек", Integer.class, null);
-        operationsGrid.addContainerProperty("Баллы", Integer.class, null);
-        operationsGrid.addContainerProperty("Примечание", String.class, null);
+        operationsGrid.addContainerProperty("Ресторан", String.class, null);
+        operationsGrid.addContainerProperty("iD клиента", Long.class, null);
+        operationsGrid.addContainerProperty("Телефон клиента", String.class, null);
+        operationsGrid.addContainerProperty("Официант", String.class, null);
+        operationsGrid.addContainerProperty("Тип транзакции", String.class, null);
+        operationsGrid.addContainerProperty("Сумма чека", Integer.class, null);
+        operationsGrid.addContainerProperty("% Кэшбэка", Integer.class, null);
+        operationsGrid.addContainerProperty("Списано баллов", Integer.class, null);
+        operationsGrid.addContainerProperty("Начислено баллов", Integer.class, null);
+        operationsGrid.addContainerProperty("Комиссия сервиса", Integer.class, null);
+        operationsGrid.addContainerProperty("Прибыль EatAction", Integer.class, null);
         operationsGrid.setSizeFull();
         operationsGrid.setColumnCollapsingAllowed(true);
         operationsGrid.setColumnReorderingAllowed(true);
@@ -127,14 +134,28 @@ public class RestaurantOperationsPanel extends VerticalLayout implements Button.
         operationsGrid.removeAllItems();
         int row = 0;
         for(OperationModel oper: list) {
+            String transactType;
+            if (oper.getDecScore() != 0) {
+                transactType = "Списание";
+            } else {
+                transactType = "Начисление";
+            }
+            int cashback = oper.getCashbackBaseRate() + oper.getCashbackBonusRate();
+            String operDateTime = oper.getOperDate()+" "+oper.getOperTime();
             operationsGrid.addItem(new Object[]{
-                oper.getUserName(),
-                oper.getWaiterName(),
-                oper.getShortDateTime(),
-                oper.getCheckSum(),
-                oper.getScore(),
-                oper.getComment()
-                }, ++row);            
+                    operDateTime,
+                    oper.getRestaurantName(),
+                    oper.getUserId(),
+                    oper.getUserPhone(),
+                    oper.getWaiterName(),
+                    transactType,
+                    oper.getCheckSum(),
+                    cashback,
+                    oper.getDecScore(),
+                    oper.getAddScore(),
+                    oper.getCalcCommissionSum(),
+                    oper.getCalcIncomeSum()
+                    }, ++row);            
         }
         operationsGrid.setPageLength(10);
         if (row > FIX_ROW_COUNT) {
@@ -184,5 +205,10 @@ public class RestaurantOperationsPanel extends VerticalLayout implements Button.
     public void setRestaurantId(long restaurantId) {
         this.restaurantId = restaurantId;
         clearTable();
-        }
+    }
+
+    public long getRestaurantId() {
+        return restaurantId;
+    }
+    
 }

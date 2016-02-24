@@ -9,9 +9,7 @@ import java.text.DecimalFormatSymbols;
 
 public class EatsterCoordField extends HorizontalLayout {
 
-    private static final long serialVersionUID = 1L;
-//    NumberField numFieldInt = new NumberField();
-//    NumberField numFieldFloat = new NumberField();
+    private static final long serialVersionUID = 1758219332186413685L;
     TextField numFieldInt = new TextField();
     TextField numFieldFloat = new TextField();
     private static final int DECIMAL_PRECISION = 4;
@@ -31,24 +29,6 @@ public class EatsterCoordField extends HorizontalLayout {
         numFieldFloat.addValidator(new RegexpValidator("\\d{2,4}", "В дробной части координаты допустимо значение от 2х до 4х цифр"));
         numFieldInt.setWidth(WIDTH_INT,Unit.CM);
         numFieldFloat.setWidth(WIDTH_FLOAT,Unit.CM);
-        /*
-        //
-        numFieldInt.setDecimalAllowed(false); 
-        numFieldInt.setDecimalPrecision(0);
-        numFieldInt.setMinValue(0);
-        numFieldInt.setMaxValue(999);
-        numFieldInt.setNegativeAllowed(false);
-        numFieldInt.setWidth(WIDTH_INT,Unit.CM);
-        numFieldInt.setGroupingUsed(false);
-        //
-        numFieldFloat.setDecimalAllowed(false); 
-        numFieldFloat.setDecimalPrecision(0);
-        numFieldFloat.setMinValue(0);
-        numFieldFloat.setMaxValue(9999);
-        numFieldFloat.setNegativeAllowed(false);
-        numFieldFloat.setWidth(WIDTH_FLOAT,Unit.CM);
-        numFieldFloat.setGroupingUsed(false);
-        */
     }
 
     private static char decimalSeparator() {
@@ -86,5 +66,11 @@ public class EatsterCoordField extends HorizontalLayout {
     public double getValue() {
         double result = coordToFloat(numFieldInt.getValue(), numFieldFloat.getValue(), coordOld);
         return result;
+    }
+    
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        numFieldInt.setReadOnly(readOnly);
+        numFieldFloat.setReadOnly(readOnly);
     }
 }

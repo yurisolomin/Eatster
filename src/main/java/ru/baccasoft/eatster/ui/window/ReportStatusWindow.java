@@ -22,7 +22,7 @@ import ru.baccasoft.utils.logging.Logger;
 public class ReportStatusWindow extends Window {
 
     private static final Logger LOG = Logger.getLogger(ActionPanel.class);
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -132507953344942981L;
 
     private class Fields {
 

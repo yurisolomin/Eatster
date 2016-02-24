@@ -17,16 +17,14 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import ru.baccasoft.eatster.model.ActionModel;
 import ru.baccasoft.eatster.ui.AppUI;
-import ru.baccasoft.eatster.ui.component.ModerationPhotoPanel.ModerationType;
+import ru.baccasoft.eatster.ui.component.ComponentModerationPhoto.ModerationType;
 import ru.baccasoft.eatster.ui.event.ModerationAction_Event;
-import ru.baccasoft.utils.logging.Logger;
 
-public class ModerationActionPanel extends VerticalLayout
+public class ComponentModerationAction extends VerticalLayout
         implements
         Button.ClickListener {
 
-    private static final long serialVersionUID = 1L;
-    private static final Logger LOG = Logger.getLogger(ModerationActionPanel.class);
+    private static final long serialVersionUID = 8840426199626143256L;
 
     private class ActionFields {
 
@@ -34,7 +32,6 @@ public class ModerationActionPanel extends VerticalLayout
         ComboBox status = new ComboBox("Статус");//
         ComboBox actionTypeId = new EatsterIdComboBox("Тип", "Укажите тип акции");
         ComboBox actionSubTypeId = new EatsterIdComboBox("Подтип", "Укажите подтип акции");
-//        ComboBox actionTimeRangeId = new EatsterIdComboBox("Время работы", "Укажите время работы");
         ComboBox startTime = new ComboBox();
         ComboBox endTime = new ComboBox();
         TextArea comment = new TextArea("Полный текст акции");//
@@ -71,17 +68,14 @@ public class ModerationActionPanel extends VerticalLayout
 
     }
     private final ActionFields actionFields = new ActionFields();
-    //private static final int WIDTH_DELETE = 4;
-    //private static final int WIDTH_CONFIRM = 4;
     private final Button btnConfirm = new Button("Утвердить", this);
     private final Button btnBan = new Button("Бан", this);
     private final TextField restaurant = new TextField();
     private static final int WIDTH_RESTAURANT = 12;
 
     private ActionModel actionModel = null;
-    //private BeanFieldGroup<ActionModel> actionFieldBindings = null;
 
-    public ModerationActionPanel() {
+    public ComponentModerationAction() {
         buildLayout();
     }
 
@@ -91,9 +85,6 @@ public class ModerationActionPanel extends VerticalLayout
     }
 
     public final void buildLayout() {
-        //btnConfirm.setWidth(WIDTH_CONFIRM, Unit.CM);
-        //btnDelete.setWidth(WIDTH_DELETE, Unit.CM);
-
         Panel panel = new Panel();
         panel.setCaption("АКЦИЯ");
         panel.setSizeUndefined();
@@ -126,12 +117,6 @@ public class ModerationActionPanel extends VerticalLayout
 
         restaurant.setReadOnly(true);
         restaurant.setWidth(WIDTH_RESTAURANT, Unit.CM);
-//        addToGrid(grid, 0, 4, layout);
-//        grid.setComponentAlignment(layout, Alignment.TOP_RIGHT);
-/*        HorizontalLayout layout = new HorizontalLayout(restaurant,btnConfirm,btnDelete);
-        layout.setSpacing(true);
-        layout.setWidth("100%");
-        addComponent(layout);*/
     }
 
     @Override
@@ -176,7 +161,6 @@ public class ModerationActionPanel extends VerticalLayout
     }
 
     public void setPanelCaption(String caption) {
-        //panel.setCaption(caption);
         restaurant.setReadOnly(false);
         restaurant.setValue(caption);
         restaurant.setReadOnly(true);

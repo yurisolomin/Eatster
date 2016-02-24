@@ -14,7 +14,7 @@ import ru.baccasoft.eatster.ui.component.MainMenuPanel;
 @UIScope
 @SpringView(name = NoRestaurantsView.NAME)
 public class NoRestaurantsView extends VerticalLayout implements View {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -1727999837123206194L;
     public static final String NAME = "norestaurants";
     private RestaurantHeaderPanel headerPanel;
     private MainMenuPanel mainMenu;
@@ -26,7 +26,7 @@ public class NoRestaurantsView extends VerticalLayout implements View {
     void init() {
         setSpacing(true);
         mainMenu = new MainMenuPanel();
-        mainMenu.addButtonLogout();
+        mainMenu.addSysButtons();
         addComponent(mainMenu);
         headerPanel = new RestaurantHeaderPanel();
         addComponent(headerPanel);

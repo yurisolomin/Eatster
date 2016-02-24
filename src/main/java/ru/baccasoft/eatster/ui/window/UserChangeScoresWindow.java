@@ -10,7 +10,6 @@ import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import ru.baccasoft.eatster.appconfig.AppProp;
 import ru.baccasoft.eatster.model.DateAsString;
 import ru.baccasoft.eatster.model.OperationModel;
 import ru.baccasoft.eatster.ui.AppUI;
@@ -18,7 +17,7 @@ import ru.baccasoft.eatster.ui.event.AdminOperationInsert_Event;
 
 public class UserChangeScoresWindow extends Window {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -7191529315152417163L;
 
     public enum ActionType {
         Add, Dec
@@ -89,6 +88,7 @@ public class UserChangeScoresWindow extends Window {
         //
         Button cancelButton = new Button("Отмена");
         cancelButton.addClickListener(new ClickListener() {
+            private static final long serialVersionUID = 5019806363620874205L;
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 close(); // Close the sub-window
@@ -97,6 +97,7 @@ public class UserChangeScoresWindow extends Window {
         //
         Button actionButton = new Button("Подтвердить");
         actionButton.addClickListener(new ClickListener() {
+            private static final long serialVersionUID = 5019806363620874205L;
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (!validate()) {
@@ -106,22 +107,18 @@ public class UserChangeScoresWindow extends Window {
                 if (comment == null) {
                     comment = "";
                 }
-                int scores = 0;
-                if (getAction() == ActionType.Add) {
-                    scores = getScores();
-                }
-                if (getAction() == ActionType.Dec) {
-                    scores = -getScores();
-                }
                 OperationModel operationModel = new OperationModel();
                 operationModel.setCheckSum(0);
                 operationModel.setComment(comment);
                 operationModel.setOperDate(DateAsString.getInstance().curDateAsString());
                 operationModel.setOperTime(DateAsString.getInstance().curTimeAsHHMM());
-                operationModel.setRestaurantId(0);
-                operationModel.setScore(scores);
+                if (getAction() == ActionType.Add) {
+                    operationModel.setAddScore(getScores());
+                }
+                if (getAction() == ActionType.Dec) {
+                    operationModel.setDecScore(getScores());
+                }
                 operationModel.setUserId(userId);
-                operationModel.setWaiterId(0);
                 operationModel.setStatus(OperationModel.STATUS_CONFIRMED);
                 getUI().fire(new AdminOperationInsert_Event(operationModel));
                 close(); // Close the sub-window

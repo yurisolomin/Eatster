@@ -6,7 +6,7 @@ import ru.baccasoft.eatster.ui.event.RestaurantPhotoUploaded_Event;
 
 public class ButtonUploadRestaurantPhoto extends UploadField {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -6779784253950627564L;
 
     RestaurantPhotoPanel restaurantPhotoPanel;
     //private static final int PHOTO_MAX_SIZE = 2000000;

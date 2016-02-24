@@ -14,8 +14,8 @@ import ru.baccasoft.eatster.appconfig.AppProp;
 import ru.baccasoft.eatster.ui.AppUI;
 
 public class RestaurantNoActiveWindow extends Window implements Button.ClickListener {
-    
-    private static final long serialVersionUID = 1L;
+
+    private static final long serialVersionUID = -4350430143870174763L;
 
     private Button buttonTransferInfo;
     private Button buttonClose;

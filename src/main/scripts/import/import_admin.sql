@@ -1,5 +1,5 @@
 
-insert into partner (deleted,modified,name,password,contact_name,contact_post,contact_email,contact_note,contact_phone,admin) values(false,now(),'admin','***','','','','','',true);
+insert into partner (deleted,modified,name,password,contact_name,contact_post,contact_email,contact_note,contact_phone,admin) values(false,now(),'*','*','','','','','',true);
 
 
 INSERT INTO restaurant (deleted,modified,
@@ -13,7 +13,7 @@ cards_jcb,cards_mir,
 workday_starttime,workday_endtime,holiday_starttime,holiday_endtime
 )
 VALUES (false,now(),
-'Клуб Eatster','','inactive',1,null,null,'',0,0,1,'','',1,
+'Клуб *','','inactive',1,null,null,'',0,0,1,'','',1,
 false,1,false,'',
 false,false,false,false,false,false,false,false,
 false,false,false,false,false,false,false,
@@ -24,7 +24,7 @@ false,false,
 );
 
 insert into waiter (deleted,name,restaurant_id,login,password,modified)
-values (false,'Клуб Eatster',
-(select id from restaurant where name = 'Клуб Eatster' limit 1),
-'Клуб Eatster','***',now());
+values (false,'Клуб *',
+(select id from restaurant where name = 'Клуб *' limit 1),
+'Клуб *','**',now());
 

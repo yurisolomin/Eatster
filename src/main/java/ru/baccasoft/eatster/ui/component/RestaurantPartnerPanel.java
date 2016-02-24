@@ -13,8 +13,7 @@ import ru.baccasoft.eatster.ui.AppUI;
 import ru.baccasoft.utils.logging.Logger;
 
 public class RestaurantPartnerPanel extends TabSheet {
-
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 7990301684708381625L;
     private static final Logger LOG = Logger.getLogger(RestaurantPartnerPanel.class);
 
     private static final int WIDTH_FIELD = 15;
@@ -65,14 +64,14 @@ public class RestaurantPartnerPanel extends TabSheet {
         //
         form = new FormLayout(partnerFields.contactName, partnerFields.contactPost, partnerFields.contactEmail, partnerFields.contactNote, partnerFields.contactPhone);
         form.setSpacing(true);
-        form.setMargin(true);
+        //form.setMargin(true);
         form.setSizeUndefined();
         //
         addTab(form, "Контакты");
         //
         form = new FormLayout(partnerFields.name, partnerFields.password);
         form.setSpacing(true);
-        form.setMargin(true);
+        //form.setMargin(true);
         form.setSizeUndefined();
         //
         addTab(form, "Системные настройки");

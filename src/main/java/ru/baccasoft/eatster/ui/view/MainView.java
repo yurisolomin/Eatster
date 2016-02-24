@@ -2,6 +2,7 @@ package ru.baccasoft.eatster.ui.view;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Notification;
@@ -20,9 +21,7 @@ import ru.baccasoft.eatster.model.ReportModel;
 import ru.baccasoft.eatster.model.RestaurantModel;
 import ru.baccasoft.eatster.model.WaiterModel;
 import ru.baccasoft.eatster.service.ActionService;
-import ru.baccasoft.eatster.service.OperationReportService;
 import ru.baccasoft.eatster.service.OperationService;
-import ru.baccasoft.eatster.service.OperationTotalService;
 import ru.baccasoft.eatster.service.PartnerService;
 import ru.baccasoft.eatster.service.PhotoService;
 import ru.baccasoft.eatster.service.ReportService;
@@ -31,11 +30,11 @@ import ru.baccasoft.eatster.service.WaiterService;
 import ru.baccasoft.eatster.ui.AppUI;
 import ru.baccasoft.eatster.ui.component.ActionPanel;
 import ru.baccasoft.eatster.ui.component.MainMenuPanel;
-import ru.baccasoft.eatster.ui.component.ModerationPanel;
-import ru.baccasoft.eatster.ui.component.ModerationPhotoPanel;
-import ru.baccasoft.eatster.ui.component.ReportPanel;
+import ru.baccasoft.eatster.ui.component.MainMenuItemModeration;
+import ru.baccasoft.eatster.ui.component.ComponentModerationPhoto;
+import ru.baccasoft.eatster.ui.component.MainMenuItemReport;
 import ru.baccasoft.eatster.ui.component.RestaurantLogoPanel;
-import ru.baccasoft.eatster.ui.component.RestaurantPanel;
+import ru.baccasoft.eatster.ui.component.MainMenuItemRestaurant;
 import ru.baccasoft.eatster.ui.component.RestaurantPhotoPanel;
 import ru.baccasoft.eatster.ui.window.WaiterWindow;
 import ru.baccasoft.eatster.ui.event.ActionDelete_Event;
@@ -85,13 +84,11 @@ import ru.baccasoft.eatster.ui.event.WaiterDialogEdit_Listener;
 import ru.baccasoft.eatster.ui.event.WaiterDialogCreate_Listener;
 import ru.baccasoft.eatster.ui.event.WaiterDialogDelete_Listener;
 import ru.baccasoft.eatster.image.ImageBuffer;
+import ru.baccasoft.eatster.model.OperationModel;
 import ru.baccasoft.eatster.model.PartnerModel;
 import ru.baccasoft.eatster.service.MailService;
-import ru.baccasoft.eatster.service.PushService;
-import ru.baccasoft.eatster.service.PushTokenService;
-import ru.baccasoft.eatster.service.UserReportService;
-import ru.baccasoft.eatster.ui.component.PushPanel;
-import ru.baccasoft.eatster.ui.component.UsersPanel;
+import ru.baccasoft.eatster.ui.component.MainMenuItemPush;
+import ru.baccasoft.eatster.ui.component.MainMenuItemUsers;
 import ru.baccasoft.eatster.ui.event.AdminOperationInsert_Event;
 import ru.baccasoft.eatster.ui.window.WarningWindow;
 import ru.baccasoft.eatster.ui.event.AdminOperationInsert_Listener;
@@ -130,13 +127,13 @@ public class MainView extends VerticalLayout
 
     private static final Logger LOG = Logger.getLogger(MainView.class);
 
-    private static final long serialVersionUID = 1L;
     public static final String NAME = "main";
-    private RestaurantPanel restaurantPanel;
-    private ModerationPanel moderationPanel;
-    private ReportPanel reportPanel;
-    private UsersPanel usersPanel;
-    private PushPanel pushPanel;
+    private static final long serialVersionUID = 5370385328563661683L;
+    private MainMenuItemRestaurant restaurantPanel;
+    private MainMenuItemModeration moderationPanel;
+    private MainMenuItemReport reportPanel;
+    private MainMenuItemUsers usersPanel;
+    private MainMenuItemPush pushPanel;
     private MainMenuPanel mainMenu;
 
     @Autowired
@@ -148,25 +145,15 @@ public class MainView extends VerticalLayout
     @Autowired
     OperationService operationService;
     @Autowired
-    OperationTotalService operationTotalService;
-    @Autowired
     WaiterService waiterService;
     @Autowired
     PhotoService photoService;
-    @Autowired
-    OperationReportService operationReportService;
     @Autowired
     ReportService reportService;
     @Autowired
     ImageService imageService;
     @Autowired
     AppProp appProp;
-    @Autowired
-    UserReportService userReportService;
-    @Autowired
-    PushTokenService pushTokenService;
-    @Autowired
-    PushService pushService;
     @Autowired
     MailService mailService;
 
@@ -180,28 +167,29 @@ public class MainView extends VerticalLayout
 
     @PostConstruct
     void init() {
+        setMargin(new MarginInfo(false,true,false,true));
         //
         setSpacing(true);
         mainMenu = new MainMenuPanel();
         addComponent(mainMenu);
         //
-        restaurantPanel = new RestaurantPanel(photoService, actionService, restaurantService, partnerService, operationTotalService, operationService, waiterService);
+        restaurantPanel = new MainMenuItemRestaurant();
         restaurantPanel.setVisible(true);
         addComponent(restaurantPanel);
         //
-        moderationPanel = new ModerationPanel(photoService, restaurantService, actionService);
+        moderationPanel = new MainMenuItemModeration();
         moderationPanel.setVisible(false);
         addComponent(moderationPanel);
         //
-        reportPanel = new ReportPanel(operationReportService, reportService);
+        reportPanel = new MainMenuItemReport();
         reportPanel.setVisible(false);
         addComponent(reportPanel);
         //
-        usersPanel = new UsersPanel(userReportService);
+        usersPanel = new MainMenuItemUsers();
         usersPanel.setVisible(false);
         addComponent(usersPanel);
         //
-        pushPanel = new PushPanel(pushService, pushTokenService);
+        pushPanel = new MainMenuItemPush();
         pushPanel.setVisible(false);
         addComponent(pushPanel);
         //
@@ -210,7 +198,7 @@ public class MainView extends VerticalLayout
         mainMenu.addButton("Отчеты", reportPanel);
         mainMenu.addButton("Push", pushPanel);
         mainMenu.addButton("Пользователи", usersPanel);
-        mainMenu.addButtonLogout();
+        mainMenu.addSysButtons();
     }
 
     @Override
@@ -221,11 +209,17 @@ public class MainView extends VerticalLayout
             LOG.debug("Fail. Not admin or partner app. Do logout.");
             return;
         }
+        //видимость кнопок главного меню
         mainMenu.setVisibleButtons(getUI().isAdminApp());
-        if (!getUI().isAdminApp()) {
-            restaurantPanel.getInformationPanel().setReadOnly(true);
-        }
+//        if (!getUI().isAdminApp()) {
+//            restaurantPanel.getInformationPanel().setReadOnly(true);
+//        }
+        //обновить выпадающие списки данных о ресторане
         restaurantPanel.refreshComboBox();
+        //
+        //покажем если требуется кнопку отправки отчетов
+        reportPanel.getButtonRepMonthSend().setVisible(appProp.isButtonSendReports());
+        //показать панель ресторана
         onShowInformation(new ShowInformation_Event());
         LOG.debug("Ok");
     }
@@ -511,7 +505,7 @@ public class MainView extends VerticalLayout
         restaurantPanel.refreshRestaurantPanel();
     }
 
-    public RestaurantPanel getRestaurantPanel() {
+    public MainMenuItemRestaurant getRestaurantPanel() {
         return restaurantPanel;
     }
 
@@ -526,36 +520,36 @@ public class MainView extends VerticalLayout
     @Override
     public void onModerationPhoto(ModerationPhoto_Event event) {
         PhotoModel photoModel = event.getPhotoModel();
-        if (event.getModerationType() == ModerationPhotoPanel.ModerationType.BAN) {
+        if (event.getModerationType() == ComponentModerationPhoto.ModerationType.BAN) {
             photoModel.setStatus(PhotoModel.STAT_REJECTED);
         }
-        if (event.getModerationType() == ModerationPhotoPanel.ModerationType.CONFIRM) {
+        if (event.getModerationType() == ComponentModerationPhoto.ModerationType.CONFIRM) {
             photoModel.setStatus(PhotoModel.STAT_PUBLISHED);
         }
         photoService.updateItem(photoModel);
-        restaurantPanel.getListPhotosPanel().refresh();
-        moderationPanel.refresh();
+//        restaurantPanel.getListPhotosPanel().refresh();
+        moderationPanel.doRefresh();
     }
 
     @Override
     public void onModerationAction(ModerationAction_Event event) {
         ActionModel actionModel = event.getActionModel();
-        if (event.getModerationType() == ModerationPhotoPanel.ModerationType.BAN) {
+        if (event.getModerationType() == ComponentModerationPhoto.ModerationType.BAN) {
             actionModel.setStatus(ActionModel.STAT_REJECTED);
         }
-        if (event.getModerationType() == ModerationPhotoPanel.ModerationType.CONFIRM) {
+        if (event.getModerationType() == ComponentModerationPhoto.ModerationType.CONFIRM) {
             actionModel.setStatus(ActionModel.STAT_PUBLISHED);
             RestaurantModel restaurantModel = restaurantService.getItem(actionModel.getRestaurantId());
             PartnerModel partnerModel = partnerService.getItem(restaurantModel.getPartnerId());
             String partnerEMail = partnerModel.getName();
-            if (!mailService.send(partnerEMail, "Системное уведомление от Eatster", "Акция Вашего заведения прошла модерацию. Название акции - " + actionModel.getName())) {
+            if (!mailService.sendActionPublished(partnerEMail, actionModel.getName())) {
                 LOG.warn("Error on send notification about action is published! actionModel={0}"+actionModel);
-                Notification.show("ВниманиЙ Не могу отправить уведомление об утверждении акции партнеру на адрес "+partnerEMail, Notification.Type.ERROR_MESSAGE);
+                Notification.show("Внимание! Не могу отправить уведомление об утверждении акции партнеру на адрес "+partnerEMail, Notification.Type.ERROR_MESSAGE);
             }
         }
         actionService.updateItem(actionModel);
-        restaurantPanel.getListActionsPanel().refresh();
-        moderationPanel.refresh();
+//        restaurantPanel.getListActionsPanel().refresh();
+        moderationPanel.doRefresh();
     }
 
     @Override
@@ -597,9 +591,10 @@ public class MainView extends VerticalLayout
         }
 
         try {
-            event.getOperationModel().setRestaurantId(clubEatsterRestaurantId);
-            event.getOperationModel().setWaiterId(clubEatsterWaiterId);
-            operationService.insertItem(event.getOperationModel());
+            OperationModel operationModel = event.getOperationModel();
+            operationModel.setRestaurantId(clubEatsterRestaurantId);
+            operationModel.setWaiterId(clubEatsterWaiterId);
+            operationService.insertItem(operationModel);
             usersPanel.refresh();
         } catch (Exception ex) {
             LOG.debug("Error on insert operation:", ex.getMessage());
@@ -607,4 +602,9 @@ public class MainView extends VerticalLayout
         }
     }
 
+    public void doExternalRefresh() {
+        restaurantPanel.refreshComboBox();
+        restaurantPanel.doRefresh();
+        moderationPanel.doRefresh();
+    }
 }

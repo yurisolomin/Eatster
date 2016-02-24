@@ -8,11 +8,15 @@ CREATE TABLE "operation" (
     oper_date character varying(10) NOT NULL,
     oper_time character varying(5) NOT NULL,
     check_sum int NOT NULL,
-    score int NOT NULL,
     comment character varying(40) NOT NULL,
     status character varying(10) NOT NULL,
     sms_code character varying(10) NOT NULL,
-    sms_time Timestamp NULL
+    sms_time Timestamp NULL,
+    cashback_base_rate int NOT NULL,
+    cashback_bonus_rate int NOT NULL,
+    dec_score int NOT NULL,
+    add_score int NOT NULL,
+    commission_rate int NOT NULL
 );
 
 create index ndx_operation_restaurant_id on operation (restaurant_id,oper_date);

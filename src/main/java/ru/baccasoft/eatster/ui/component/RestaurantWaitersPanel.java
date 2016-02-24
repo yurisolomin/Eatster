@@ -12,19 +12,18 @@ import java.util.List;
 import org.vaadin.gridutil.GridUtil;
 import org.vaadin.gridutil.renderer.DeleteButtonValueRenderer;
 import ru.baccasoft.eatster.model.WaiterModel;
+import ru.baccasoft.eatster.service.WaiterService;
 import ru.baccasoft.eatster.ui.AppUI;
 import ru.baccasoft.eatster.ui.event.WaiterDialogCreate_Event;
 import ru.baccasoft.eatster.ui.event.WaiterDialogDelete_Event;
-import ru.baccasoft.utils.logging.Logger;
 
 public class RestaurantWaitersPanel extends VerticalLayout {
 
-    private static final long serialVersionUID = 1L;
-    private static final Logger LOG = Logger.getLogger(RestaurantWaitersPanel.class);
+    private static final long serialVersionUID = -1528772495352047846L;
 
     Grid waitersGrid;
-//    private GridCellFilter filter;
     private final Button createWaiterButton = new Button("Добавить официанта");
+    private long restaurantId = 0;
 
     public RestaurantWaitersPanel() {
         buildLayout();
@@ -39,7 +38,6 @@ public class RestaurantWaitersPanel extends VerticalLayout {
         setSpacing(true);
         addComponent(createWaiterButton);
         waitersGrid = new Grid();
-  //      filter = new GridCellFilter(waitersGrid);
         //
         waitersGrid.setContainerDataSource(new BeanItemContainer<>(WaiterModel.class));
         waitersGrid.setSizeFull();
@@ -106,8 +104,22 @@ public class RestaurantWaitersPanel extends VerticalLayout {
         return (AppUI) super.getUI();
     }
 
-    public void bindFieldsBuffered(List<WaiterModel> list) {
-        BeanItemContainer<WaiterModel> waiterContainer = new BeanItemContainer<>(WaiterModel.class, list);
+    public long getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void refresh() {
+        WaiterService waiterService = getUI().getWaiterService();
+        List<WaiterModel> waiterList = waiterService.findByRestaurant(restaurantId);
+        BeanItemContainer<WaiterModel> waiterContainer = new BeanItemContainer<>(WaiterModel.class, waiterList);
         waitersGrid.setContainerDataSource(waiterContainer);
+    }
+    
+    public void setRestaurantId(long restaurantId) {
+        this.restaurantId = restaurantId;
+    }
+    
+    public void clear() {
+        
     }
 }

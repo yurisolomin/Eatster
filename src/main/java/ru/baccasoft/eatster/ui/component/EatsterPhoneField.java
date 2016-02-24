@@ -3,11 +3,7 @@ package ru.baccasoft.eatster.ui.component;
 import com.vaadin.data.Property;
 import com.vaadin.data.validator.AbstractValidator;
 import org.vaadin.addons.maskedtextfield.MaskedTextField;
-import ru.baccasoft.utils.logging.Logger;
 
-public class EatsterPhoneField extends MaskedTextField {
-    private static final long serialVersionUID = 1L;
-    private static final Logger LOG = Logger.getLogger(RestaurantInformationPanel.class);
 /*
 https://github.com/EduFrazao/vaadin-masked-textfield/tree/v0.19
 # - any digit
@@ -20,16 +16,16 @@ H - hex sign (0-9, a-f or A-F)
 ' - Escape character, used to escape any of the special formatting characters.
 ~ - +/- sign    
 */
+public class EatsterPhoneField extends MaskedTextField {
+    private static final long serialVersionUID = 5101722426675292278L;
     private static final String DELIMITERS = "()-";
     private static final String MASK = "*#(###)###-####";
-    private static final String VALIDATOR_MESSAGE = "Заполните номер телефона по маске +7(###)###-#### или _8(###)###-####";
-//    private static final String EMPTY_VALIDATOR_MESSAGE = "Номер телефона должен быть заполнен";
+    private static final String VALIDATOR_MESSAGE = "Заполните номер телефона по маске +7(###)###-#### или 8(###)###-####";
     public static final String DEFAULT_VALUE = "+70000000000";
     public static final String EMPTY_VALUE = "0000000000"; //проверяется конец строки
     
     public EatsterPhoneField() {
         super(null, MASK);
-//        super.addValidator( new EmptyValidator(EMPTY_VALIDATOR_MESSAGE) );
         super.addValidator( new PhoneValidator(VALIDATOR_MESSAGE) );
         super.setImmediate(false);
     }
@@ -157,34 +153,4 @@ H - hex sign (0-9, a-f or A-F)
             return false;
         }
     }
-/*    
-    private static final class EmptyValidator extends AbstractValidator<String> {
-
-        private static final long serialVersionUID = 1L;
-
-        public EmptyValidator(String errorMessage) {
-            super(errorMessage);
-        }
-
-        @Override
-        public Class<String> getType() {
-            return String.class;
-        }
-
-        @Override
-        protected boolean isValidValue(String value) {
-            if (value == null) {
-                return true;
-            }
-            value = unmask(value);
-            if (value.endsWith(EMPTY_VALUE)) {
-                return false;
-            }
-            if (value.equals("")) {
-                return false;
-            }
-            return true;
-        }
-    }
-*/    
 }

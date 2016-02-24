@@ -375,21 +375,30 @@ public class ThriftHandler extends AbstractThriftProcessor<ThriftException, Thri
         List<ThriftOperationData> outOperations = new ArrayList();
         int iTotal = 0, iSpent = 0;
         for(OperationModel inOper: inOperations) {
-            ThriftOperationData outOper = new ThriftOperationData (
-                    inOper.getOperDate(),
-                    inOper.getOperTime(),
-                    inOper.getRestaurantId(),
-                    inOper.getRestaurantName(),
-                    inOper.getCheckSum(),
-                    inOper.getScore()
+            iTotal += inOper.getAddScore();
+            iSpent += inOper.getDecScore();
+            if (inOper.getDecScore() != 0) {
+                ThriftOperationData outOper = new ThriftOperationData (
+                        inOper.getOperDate(),
+                        inOper.getOperTime(),
+                        inOper.getRestaurantId(),
+                        inOper.getRestaurantName(),
+                        0,
+                        -inOper.getDecScore()
                     );
-            int score = outOper.getScore();
-            if (score > 0) {
-                iTotal += score;
-            } else {
-                iSpent -= score;
+                outOperations.add(outOper);
             }
-            outOperations.add(outOper);
+            if (inOper.getAddScore() != 0) {
+                ThriftOperationData outOper = new ThriftOperationData (
+                        inOper.getOperDate(),
+                        inOper.getOperTime(),
+                        inOper.getRestaurantId(),
+                        inOper.getRestaurantName(),
+                        inOper.getCheckSum() - inOper.getDecScore(),
+                        inOper.getAddScore()
+                    );
+                outOperations.add(outOper);
+            }
         }
         int bonusPeriodEstimate = userBonusService.getPeriodEstimateOnCurDate(user.getId());
         myScores.setBalance(iTotal - iSpent);

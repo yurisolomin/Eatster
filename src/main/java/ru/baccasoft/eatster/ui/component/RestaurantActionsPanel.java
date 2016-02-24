@@ -1,8 +1,5 @@
 package ru.baccasoft.eatster.ui.component;
 
-import com.vaadin.shared.ui.MarginInfo;
-import ru.baccasoft.eatster.ui.view.*;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
@@ -11,25 +8,19 @@ import java.util.List;
 import ru.baccasoft.eatster.model.ActionModel;
 import ru.baccasoft.eatster.service.ActionService;
 import ru.baccasoft.eatster.ui.AppUI;
-import ru.baccasoft.utils.logging.Logger;
 
 public class RestaurantActionsPanel extends VerticalLayout {
 
-    private static final Logger LOG = Logger.getLogger(AdminLoginView.class);
+    private static final long serialVersionUID = -6241740858114483242L;
 
-    private static final long serialVersionUID = 1L;
     VerticalLayout layoutActions = null;
-    ActionService actionService;
-
     private long restaurantId = 0;
 
-    public RestaurantActionsPanel(ActionService actionService) {
-        this.actionService = actionService;
+    public RestaurantActionsPanel() {
         buildLayout();
     }
 
     private void buildLayout() {
-//        setSpacing(true);
         layoutActions = new VerticalLayout();
         layoutActions.setSpacing(true);
         addComponent(layoutActions);
@@ -40,12 +31,14 @@ public class RestaurantActionsPanel extends VerticalLayout {
         return (AppUI) super.getUI();
     }
 
-    public void refresh() {
-        // TODO Auto-generated method stub
-        Notification.show("АКЦИИ", Type.HUMANIZED_MESSAGE);
-//        this.restaurantId = getUI().getMainView().getSelectedRestaurantId();
-        this.restaurantId = getUI().getMainView().getRestaurantPanel().getSelectedRestaurantId();
+    public void clear() {
         layoutActions.removeAllComponents();
+    }
+    
+    public void refresh() {
+        Notification.show("АКЦИИ", Type.HUMANIZED_MESSAGE);
+        clear();
+        ActionService actionService = getUI().getActionService();
         List<ActionModel> listActions = actionService.findByRestaurantAll(restaurantId);
         for (ActionModel actionModel : listActions) {
             ActionPanel actionPanel = new ActionPanel();
@@ -53,7 +46,7 @@ public class RestaurantActionsPanel extends VerticalLayout {
             actionPanel.setActionModel(actionModel);
         }
     }
-
+    
     public ActionPanel findNewActionPanel() {
         for(Component component:layoutActions) {
             ActionPanel actionPanel = (ActionPanel)component;
@@ -64,7 +57,7 @@ public class RestaurantActionsPanel extends VerticalLayout {
         return null;
     }
     
-    public void createActionPanel() {
+    public void addNewActionPanel() {
         ActionPanel actionPanel = new ActionPanel();
         layoutActions.addComponentAsFirst(actionPanel);
         ActionModel actionModel = new ActionModel();
@@ -76,4 +69,13 @@ public class RestaurantActionsPanel extends VerticalLayout {
     public void removeActionPanel(ActionPanel actionPanel) {
         layoutActions.removeComponent(actionPanel);
     }
+
+    public long getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(long restaurantId) {
+        this.restaurantId = restaurantId;
+    }
+    
 }

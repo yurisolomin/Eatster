@@ -1,4 +1,3 @@
-
 package ru.baccasoft.eatster.thrift.server;
 
 import java.io.PrintWriter;
@@ -12,16 +11,16 @@ import org.slf4j.Logger;
 
 /* package */ abstract class AbstractThriftProcessor<TheException extends Exception, TheBase> {
 	/**
-	 * Обертка для операции сервиса.
+	 * РћР±РµСЂС‚РєР° РґР»СЏ РѕРїРµСЂР°С†РёРё СЃРµСЂРІРёСЃР°.
 	 */
 	public interface IOperationProcessor<TheException extends Exception, TheBase, Input, Output> {
-		/** Собственно, операция */
+		/** РЎРѕР±СЃС‚РІРµРЅРЅРѕ, РѕРїРµСЂР°С†РёСЏ */
 		Output process( Input input ) throws TheException, Throwable;
 		
-		/** Костыль для извлечения t.r.b. */
+		/** РљРѕСЃС‚С‹Р»СЊ РґР»СЏ РёР·РІР»РµС‡РµРЅРёСЏ t.r.b. */
 		TheBase extractBase( Input input );
 
-		/** Имя операции (для логгирования) */
+		/** РРјСЏ РѕРїРµСЂР°С†РёРё (РґР»СЏ Р»РѕРіРіРёСЂРѕРІР°РЅРёСЏ) */
 		String getOperationName();
 		
 		String getLoggingPrefix( TheBase base );
@@ -37,7 +36,7 @@ import org.slf4j.Logger;
 	protected abstract Logger LOG();
 	
 	/**
-	 * Текущая серверная версия thrift-протокола
+	 * РўРµРєСѓС‰Р°СЏ СЃРµСЂРІРµСЂРЅР°СЏ РІРµСЂСЃРёСЏ thrift-РїСЂРѕС‚РѕРєРѕР»Р°
 	 */
 	protected abstract String SERVICE_VERSION();
 
@@ -52,8 +51,8 @@ import org.slf4j.Logger;
 			final TheBase base = processor.extractBase(input);
 			loggingPrefix = processor.getLoggingPrefix(base);
 			
-			// в лог выдается также идентификатор потока, по сочетанию поток+уид мы сможем идентифицировать
-			// запросы к боевому стенду при наличии проблем и параллельной работе нескольких клиентов
+			// РІ Р»РѕРі РІС‹РґР°РµС‚СЃСЏ С‚Р°РєР¶Рµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїРѕС‚РѕРєР°, РїРѕ СЃРѕС‡РµС‚Р°РЅРёСЋ РїРѕС‚РѕРє+СѓРёРґ РјС‹ СЃРјРѕР¶РµРј РёРґРµРЅС‚РёС„РёС†РёСЂРѕРІР°С‚СЊ
+			// Р·Р°РїСЂРѕСЃС‹ Рє Р±РѕРµРІРѕРјСѓ СЃС‚РµРЅРґСѓ РїСЂРё РЅР°Р»РёС‡РёРё РїСЂРѕР±Р»РµРј Рё РїР°СЂР°Р»Р»РµР»СЊРЅРѕР№ СЂР°Р±РѕС‚Рµ РЅРµСЃРєРѕР»СЊРєРёС… РєР»РёРµРЅС‚РѕРІ
 			if( LOG().isDebugEnabled() ) {
 				LOG().debug( loggingPrefix + "request is: "+ input);
 			} else {
@@ -89,7 +88,7 @@ import org.slf4j.Logger;
 		}
 	}
 	
-	/** Костыль, чтобы не запрещать полезный ворнинг у {@link #process(Object, IOperationProcessor)}. */
+	/** РљРѕСЃС‚С‹Р»СЊ, С‡С‚РѕР±С‹ РЅРµ Р·Р°РїСЂРµС‰Р°С‚СЊ РїРѕР»РµР·РЅС‹Р№ РІРѕСЂРЅРёРЅРі Сѓ {@link #process(Object, IOperationProcessor)}. */
 	@SuppressWarnings("unchecked")
 	private TheException castToTheException( Throwable t ) {
 		return (TheException) t;
@@ -103,11 +102,11 @@ import org.slf4j.Logger;
 	}
 
     /**
-     * Spring заворачивает SQLException-ы так глубоко, что без поллитры до исходной ошибки не докопаешься.
-     * Костыль с той самой поллитрой, чтобы исходная ошибка долетала ло лога.
+     * Spring Р·Р°РІРѕСЂР°С‡РёРІР°РµС‚ SQLException-С‹ С‚Р°Рє РіР»СѓР±РѕРєРѕ, С‡С‚Рѕ Р±РµР· РїРѕР»Р»РёС‚СЂС‹ РґРѕ РёСЃС…РѕРґРЅРѕР№ РѕС€РёР±РєРё РЅРµ РґРѕРєРѕРїР°РµС€СЊСЃСЏ.
+     * РљРѕСЃС‚С‹Р»СЊ СЃ С‚РѕР№ СЃР°РјРѕР№ РїРѕР»Р»РёС‚СЂРѕР№, С‡С‚РѕР±С‹ РёСЃС…РѕРґРЅР°СЏ РѕС€РёР±РєР° РґРѕР»РµС‚Р°Р»Р° Р»Рѕ Р»РѕРіР°.
      * <p/> 
-     * TODO копипаст из коммонзовского AbstractThriftProcessor-а, надо объединить, но ломает ради этого 
-     *         фиксировать версию мавен-артефакта  
+     * TODO РєРѕРїРёРїР°СЃС‚ РёР· РєРѕРјРјРѕРЅР·РѕРІСЃРєРѕРіРѕ AbstractThriftProcessor-Р°, РЅР°РґРѕ РѕР±СЉРµРґРёРЅРёС‚СЊ, РЅРѕ Р»РѕРјР°РµС‚ СЂР°РґРё СЌС‚РѕРіРѕ 
+     *         С„РёРєСЃРёСЂРѕРІР°С‚СЊ РІРµСЂСЃРёСЋ РјР°РІРµРЅ-Р°СЂС‚РµС„Р°РєС‚Р°  
      */
     public static void logSqlException( Logger theLogger, String logPrefix, Throwable t) {
         if( t.getCause() != null  && (t.getCause() instanceof SQLException) ) {
@@ -120,4 +119,3 @@ import org.slf4j.Logger;
     }
     
 }
-

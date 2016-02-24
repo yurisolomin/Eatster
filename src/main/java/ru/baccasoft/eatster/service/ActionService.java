@@ -40,8 +40,9 @@ public class ActionService {
          "(case status"
         +" when '"+ActionModel.STAT_PUBLISHED+"' then 0"
         +" when '"+ActionModel.STAT_MODERATION+"' then 1"
-        +" when '"+ActionModel.STAT_INACTIVE+"' then 2"
-        +" when '"+ActionModel.STAT_ARCHIVE+"' then 3"
+        +" when '"+ActionModel.STAT_REJECTED+"' then 2"
+        +" when '"+ActionModel.STAT_INACTIVE+"' then 3"
+        +" when '"+ActionModel.STAT_ARCHIVE+"' then 4"
         +" else 100"
         +" end)";
     private static final String SQL_SELECT_ALL = SQL_SELECT+" where a.deleted = false order by a.start_time";

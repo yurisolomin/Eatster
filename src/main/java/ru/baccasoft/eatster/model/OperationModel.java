@@ -10,12 +10,17 @@ public class OperationModel extends CommonIdModel {
     private String operDate;//YYYY-MM-DD
     private String operTime;//HH:MM
     private int checkSum;
-    private int score;//>0 add, < 0 dec
     private String comment;
     private String status; 
     private String restaurantName;  //из связанной таблицы
     private String userName;        //из связанной таблицы
+    private String userPhone;       //из связанной таблицы
     private String waiterName;      //из связанной таблицы
+    private int cashbackBaseRate;
+    private int cashbackBonusRate;
+    private int decScore;
+    private int addScore;
+    private int commissionRate;
 
     public OperationModel() {
         super();
@@ -25,12 +30,17 @@ public class OperationModel extends CommonIdModel {
         operDate="";
         operTime="";
         checkSum = 0;
-        score = 0;
         comment = "";
         restaurantName = "";
         userName = "";
+        userPhone = "";
         waiterName = "";
         status = "";
+        cashbackBaseRate = 0;
+        cashbackBonusRate = 0;
+        decScore = 0;
+        addScore = 0;
+        commissionRate = 0;
     }
 
     public String getComment() {
@@ -89,14 +99,6 @@ public class OperationModel extends CommonIdModel {
         this.checkSum = checkSum;
     }
 
-    public int getScore() {
-        return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
-
     public String getRestaurantName() {
         return restaurantName;
     }
@@ -140,5 +142,65 @@ public class OperationModel extends CommonIdModel {
     public void setStatus(String status) {
         this.status = status;
     }
-    
+
+    public String getUserPhone() {
+        return userPhone;
+    }
+
+    public void setUserPhone(String userPhone) {
+        this.userPhone = userPhone;
+    }
+
+    public int getCashbackBaseRate() {
+        return cashbackBaseRate;
+    }
+
+    public void setCashbackBaseRate(int cashbackBaseRate) {
+        this.cashbackBaseRate = cashbackBaseRate;
+    }
+
+    public int getCashbackBonusRate() {
+        return cashbackBonusRate;
+    }
+
+    public void setCashbackBonusRate(int cashbackBonusRate) {
+        this.cashbackBonusRate = cashbackBonusRate;
+    }
+
+    public int getDecScore() {
+        return decScore;
+    }
+
+    public void setDecScore(int decScore) {
+        this.decScore = decScore;
+    }
+
+    public int getAddScore() {
+        return addScore;
+    }
+
+    public void setAddScore(int addScore) {
+        this.addScore = addScore;
+    }
+
+    public int getCommissionRate() {
+        return commissionRate;
+    }
+
+    public void setCommissionRate(int commissionRate) {
+        this.commissionRate = commissionRate;
+    }
+
+    public int getCalcCommissionSum() {
+        return getCheckSum() * getCommissionRate() / 100;
+    }
+
+    public int getCalcIncomeSum() {
+        return getCalcCommissionSum() - getAddScore();
+    }
+
+    public int getCalcPayOffBalance() {
+        return getCalcCommissionSum() - getDecScore();
+    }
+
 }

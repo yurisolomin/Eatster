@@ -27,20 +27,21 @@ public class OperationService {
     private JdbcTemplate jdbc;
     private static final String SQL_TABLE = "operation";
     private static final String SQL_SELECT =
-         " select o.id,o.status,o.restaurant_id,o.user_id,o.waiter_id,o.oper_date,o.oper_time,o.check_sum,o.score,o.comment"
+         " select o.id,o.status,o.restaurant_id,o.user_id,o.waiter_id,o.oper_date,o.oper_time,o.check_sum,o.comment,o.cashback_base_rate,o.cashback_bonus_rate,o.dec_score,o.add_score,o.commission_rate"
         +"  ,r.name as restaurant_name"
         +"  ,u.name as user_name"
+        +"  ,u.phone as user_phone"
         +"  ,w.name as waiter_name"
         +" from operation as o"
         +" join restaurant as r on r.id = o.restaurant_id"
         +" join \"user\" as u on u.id = o.user_id"
         +" join waiter as w on w.id = o.waiter_id";
-    private static final String SQL_SELECT_ALL = SQL_SELECT+" where o.status = '"+OperationModel.STATUS_CONFIRMED+"' order by o.oper_date";
+    private static final String SQL_SELECT_ALL = SQL_SELECT+" where o.status = '"+OperationModel.STATUS_CONFIRMED+"' order by o.oper_date desc, o.oper_time desc, o.id desc";
     private static final String SQL_SELECT_ITEM = SQL_SELECT+" where o.id = ?";
     private static final String SQL_SELECT_BY_USER = SQL_SELECT+" where o.status = '"+OperationModel.STATUS_CONFIRMED+"' and o.user_id = ? order by o.oper_date desc, o.oper_time desc, o.id desc";
     private static final String SQL_SELECT_BY_REST = SQL_SELECT+" where o.status = '"+OperationModel.STATUS_CONFIRMED+"' and o.restaurant_id = ? order by o.oper_date desc, o.oper_time desc, o.id desc";
     private static final String SQL_SELECT_BY_SMSCODE = SQL_SELECT+" where o.id = ? and o.sms_code=? and date_part('min',now()-o.sms_time) between 0 and 1";
-    private static final String SQL_INSERT_ITEM = "insert into "+SQL_TABLE+" (status,modified,restaurant_id,user_id,waiter_id,oper_date,oper_time,check_sum,score,comment,sms_code) values(?,now(),?,?,?,?,?,?,?,?,'')";
+    private static final String SQL_INSERT_ITEM = "insert into "+SQL_TABLE+" (status,modified,restaurant_id,user_id,waiter_id,oper_date,oper_time,check_sum,comment,sms_code,cashback_base_rate,cashback_bonus_rate,dec_score,add_score,commission_rate) values(?,now(),?,?,?,to_char(now(),'YYYY-MM-DD'),to_char(now(),'HH24:MI'),?,?,'',?,?,?,?,?)";
     private static final String SQL_DELETE_ITEM = "update "+SQL_TABLE+" set modified=now(),status='"+OperationModel.STATUS_DELETED+"' where id = ?" ;
     private static final String SQL_UPDATE_STATUS = "update "+SQL_TABLE+" set modified=now(),status=? where id = ?" ;
     private static final String SQL_UPDATE_SMSINFO = "update "+SQL_TABLE+" set modified=now(),sms_code=?,sms_time=now() where id = ?" ;
@@ -71,10 +72,15 @@ public class OperationService {
             item.setOperDate(rs.getString(++index));
             item.setOperTime(rs.getString(++index));
             item.setCheckSum(rs.getInt(++index));
-            item.setScore(rs.getInt(++index));
             item.setComment(rs.getString(++index));
+            item.setCashbackBaseRate(rs.getInt(++index));
+            item.setCashbackBonusRate(rs.getInt(++index));
+            item.setDecScore(rs.getInt(++index));
+            item.setAddScore(rs.getInt(++index));
+            item.setCommissionRate(rs.getInt(++index));
             item.setRestaurantName(rs.getString(++index));
             item.setUserName(rs.getString(++index));
+            item.setUserPhone(rs.getString(++index));
             item.setWaiterName(rs.getString(++index));
             return item;
         }
@@ -150,11 +156,15 @@ public class OperationService {
                     ps.setLong(++index, item.getRestaurantId());
                     ps.setLong(++index, item.getUserId());
                     ps.setLong(++index, item.getWaiterId());
-                    ps.setString(++index, item.getOperDate());//YYYY-MM-DD
-                    ps.setString(++index, item.getOperTime());//HH:MM
+//                    ps.setString(++index, item.getOperDate());//YYYY-MM-DD
+//                    ps.setString(++index, item.getOperTime());//HH:MM
                     ps.setInt(++index, item.getCheckSum());
-                    ps.setInt(++index, item.getScore());//>0 add, < 0 dec
                     ps.setString(++index, item.getComment());
+                    ps.setInt(++index, item.getCashbackBaseRate());
+                    ps.setInt(++index, item.getCashbackBonusRate());
+                    ps.setInt(++index, item.getDecScore());
+                    ps.setInt(++index, item.getAddScore());
+                    ps.setInt(++index, item.getCommissionRate());
                     return ps;
                 }
             },
@@ -244,19 +254,6 @@ public class OperationService {
         return null;
     }
         
-/*
-    @Transactional
-    public int updateItem(OperationModel item) {
-        logger.debug("updateItem: item={0}",item);
-        int result = jdbc.update(SQL_UPDATE, 
-                new Object[]{
-                    item.getName(), 
-                    item.getId()} 
-        );
-        logger.debug("Ok. return {0}",result);
-        return result;
-    }
-*/    
     @Transactional
     public int deleteItem(long id) {
         LOG.debug("deleteItem: id={0}",id);
@@ -264,5 +261,37 @@ public class OperationService {
         LOG.debug("Ok. return {0}",result);
         return result;
     }
+/*
+    private int roundToCeil(double fValue) {
+        String sValue = String.format("%.0f",fValue);
+        return Integer.parseInt(sValue);
+    }
     
+    public void calculateModel(OperationModel operationModel) {
+        LOG.debug("calculateModel:operationModel="+operationModel);
+        //
+        int checkSum = operationModel.getCheckSum();
+        int decScore = operationModel.getDecScore();
+        int baseRate = operationModel.getCashbackBaseRate();
+        int bonusRate = operationModel.getCashbackBonusRate();
+        int commissionRate = operationModel.getCommissionRate();
+        //
+        int clearSum = checkSum - decScore;
+        LOG.debug("clearSum(checkSum-decScore)="+clearSum);
+        double fAddScore = 1f * clearSum * (baseRate + bonusRate) / 100;
+        LOG.debug("fAddScore="+fAddScore);
+        int iAddScore = roundToCeil(fAddScore);
+        LOG.debug("iAddScore="+iAddScore);
+        operationModel.setAddScore(iAddScore);
+        double fCommissionSum = 1f * checkSum * commissionRate / 100;
+        LOG.debug("fCommissionSum="+fCommissionSum);
+        int iCommissionSum = roundToCeil(fCommissionSum);
+        LOG.debug("iCommissionSum="+iCommissionSum);
+        operationModel.setCommissionSum(iCommissionSum);
+        int incomeSum = iCommissionSum - iAddScore;
+        LOG.debug("incomeSum="+incomeSum);
+        operationModel.setIncomeSum(incomeSum);
+        LOG.debug("Ok. operationModel="+operationModel);
+    }
+*/
 }

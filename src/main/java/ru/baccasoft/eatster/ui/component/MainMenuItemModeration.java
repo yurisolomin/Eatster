@@ -16,9 +16,9 @@ import ru.baccasoft.utils.logging.Logger;
 
 //FIX ME статусы фоток акций находятся в таблице акций. не знаю верно ли это. хорошо бы исправить
 
-public class ModerationPanel extends VerticalLayout implements Button.ClickListener {
+public class MainMenuItemModeration extends MainMenuItemLayout implements Button.ClickListener {
 
-    private static final Logger LOG = Logger.getLogger(ModerationPanel.class);
+    private static final Logger LOG = Logger.getLogger(MainMenuItemModeration.class);
     private static final long serialVersionUID = 1L;
     
     private static final int WIDTH_BUTTON = 5;
@@ -26,22 +26,17 @@ public class ModerationPanel extends VerticalLayout implements Button.ClickListe
     private final Button btnActPhotos = new Button("Акции",this);
     private final Button btnRestPhotos = new Button("Фотографии",this);
     VerticalLayout layoutItems = new VerticalLayout();
-    PhotoService photoService;
-    RestaurantService restaurantService;
-    ActionService actionService;
+
     private enum ObjectType { ACTPHOTOS, RESTPHOTOS };
     private ObjectType objectType = null;
     
     
-    public ModerationPanel(PhotoService photoService, RestaurantService restaurantService, ActionService actionService) {
-        this.photoService = photoService;
-        this.restaurantService = restaurantService;
-        this.actionService = actionService;
+    public MainMenuItemModeration() {
         buildLayout();
     }
     
     public final void buildLayout() {
-        setMargin(true);
+        //setMargin(true);
         setSpacing(true);
         btnActPhotos.setWidth(WIDTH_BUTTON, Unit.CM);
         btnRestPhotos.setWidth(WIDTH_BUTTON, Unit.CM);
@@ -57,54 +52,25 @@ public class ModerationPanel extends VerticalLayout implements Button.ClickListe
     public AppUI getUI() {
         return (AppUI) super.getUI();
     }
-/*
-    public void loadActPhotos() {
-        LOG.debug("loadActPhotos:");
-        layoutPhotos.removeAllComponents();
-        List<PhotoModel> listPhotos = photoService.findActPhotosToModeration();
-        LOG.debug("loaded={0}",listPhotos.size());
-        for(PhotoModel photoModel: listPhotos) {
-            ModerationPhotoPanel moderationPhotoPanel = new ModerationPhotoPanel();
-            layoutPhotos.addComponent(moderationPhotoPanel);
-            moderationPhotoPanel.setPhotoModel(photoModel);
-            long actionId = photoModel.getObjectId();
-            ActionModel actionModel = actionService.getItem(actionId);
-            if (actionModel == null) {
-                LOG.warn("Action not found by objectId={0}",actionId);
-                continue;
-            }
-            long restaurantId = actionModel.getRestaurantId();
-            RestaurantModel restaurantModel = restaurantService.getItem(restaurantId);
-            if (restaurantModel == null) {
-                LOG.warn("Restaurant not found by restaurantId={0}",restaurantId);
-                continue;
-            }
-            moderationPhotoPanel.setPanelCaption(restaurantModel.getName());
-        }
-        LOG.debug("Ok");
-    }
-*/
+    
     public void loadActPhotos() {
         objectType = ObjectType.ACTPHOTOS;
         LOG.debug("loadActPhotos:");
         layoutItems.removeAllComponents();
+        //
+        ActionService actionService = getUI().getActionService();
+        RestaurantService restaurantService = getUI().getRestaurantService();
+        //
         List<ActionModel> listActions = actionService.findAllToModeration();
         LOG.debug("found actions={0}",listActions.size());
         for(ActionModel actionModel: listActions) {
-/*        
-            long actionId = actionModel.getId();
-            PhotoModel photoModel = photoService.getItem(actionId,PhotoModel.TYPE_ACT_PHOTO);
-            if (photoModel == null) {
-                LOG.warn("Photo not found by actionId={0}",actionId);
-                continue;
-            }*/
             long restaurantId = actionModel.getRestaurantId();
             RestaurantModel restaurantModel = restaurantService.getItem(restaurantId);
             if (restaurantModel == null) {
                 LOG.warn("Restaurant not found by restaurantId={0}",restaurantId);
                 continue;
             }
-            ModerationActionPanel moderationActionPanel = new ModerationActionPanel();
+            ComponentModerationAction moderationActionPanel = new ComponentModerationAction();
             layoutItems.addComponent(moderationActionPanel);
             moderationActionPanel.setActionModel(actionModel);
             moderationActionPanel.setPanelCaption(restaurantModel.getName());
@@ -119,9 +85,13 @@ public class ModerationPanel extends VerticalLayout implements Button.ClickListe
         objectType = ObjectType.RESTPHOTOS;
         LOG.debug("loadRestPhotos:");
         layoutItems.removeAllComponents();
+        //
+        RestaurantService restaurantService = getUI().getRestaurantService();
+        PhotoService photoService = getUI().getPhotoService();
+        //
         List<PhotoModel> listPhotos = photoService.findRestPhotosToModeration();
         for(PhotoModel photoModel: listPhotos) {
-            ModerationPhotoPanel moderationPhotoPanel = new ModerationPhotoPanel();
+            ComponentModerationPhoto moderationPhotoPanel = new ComponentModerationPhoto();
             layoutItems.addComponent(moderationPhotoPanel);
             moderationPhotoPanel.setPhotoModel(photoModel);
             long restaurantId = photoModel.getObjectId();
@@ -148,7 +118,8 @@ public class ModerationPanel extends VerticalLayout implements Button.ClickListe
         }
     }
     
-    public void refresh() {
+    @Override
+    public void doRefresh() {
         if (objectType == ObjectType.RESTPHOTOS) {
             loadRestPhotos();
         }

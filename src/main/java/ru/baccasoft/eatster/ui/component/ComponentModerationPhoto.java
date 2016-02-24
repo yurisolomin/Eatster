@@ -11,16 +11,9 @@ import com.vaadin.ui.VerticalLayout;
 import ru.baccasoft.eatster.model.PhotoModel;
 import ru.baccasoft.eatster.ui.AppUI;
 import ru.baccasoft.eatster.ui.event.ModerationPhoto_Event;
-import ru.baccasoft.utils.logging.Logger;
 
-public class ModerationPhotoPanel extends VerticalLayout
-        implements
-        Button.ClickListener
-        {
-
-    private static final long serialVersionUID = 1L;
-    private static final Logger LOG = Logger.getLogger(ModerationPhotoPanel.class);
-
+public class ComponentModerationPhoto extends VerticalLayout implements Button.ClickListener {
+    private static final long serialVersionUID = 8511650517619587185L;
     private static final float WIDTH_IMAGE = 14f;
     private static final int HEIGHT_IMAGE = 8;
     private static final int WIDTH_RESTAURANT = 9;
@@ -35,15 +28,10 @@ public class ModerationPhotoPanel extends VerticalLayout
     
     private PhotoModel photoModel = null;
     
-    public ModerationPhotoPanel() {
+    public ComponentModerationPhoto() {
         buildLayout();
     }
-/*
-    private void addToGrid(GridLayout grid, int col, int row, Component component) {
-        grid.addComponent(component, col, row);
-        grid.setComponentAlignment(component, Alignment.TOP_LEFT);
-    }
-*/
+    
     public final void buildLayout() {
         restaurant.setReadOnly(true);
         restaurant.setWidth(WIDTH_RESTAURANT, Unit.CM);
@@ -90,7 +78,6 @@ public class ModerationPhotoPanel extends VerticalLayout
     }
     
     public void setPanelCaption(String caption) {
-        //panel.setCaption(caption);
         restaurant.setReadOnly(false);
         restaurant.setValue(caption);
         restaurant.setReadOnly(true);

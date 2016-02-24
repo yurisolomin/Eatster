@@ -86,6 +86,8 @@ INSERT INTO actionsubtype (deleted,modified,name,actiontype_id) VALUES (false,no
 --эта строчка ('Ресторана') появилась позже, убедитесь что в МП она будет иметь тот-же ID
 INSERT INTO actionsubtype (deleted,modified,name,actiontype_id) VALUES (false,now(),'Ресторана',(select max(id) from actiontype));
 INSERT INTO actionsubtype (deleted,modified,name,actiontype_id) VALUES (false,now(),'Праздник',(select max(id) from actiontype));
+--а эта строчка появилась спустя месяц, когда 'Ресторана' решили убрать
+update actionsubtype set deleted = true where name= 'Ресторана' and actiontype_id = 5;
 
 INSERT INTO actiontype (deleted,modified,name) VALUES (false,now(),'Специальная акция');
 INSERT INTO actionsubtype (deleted,modified,name,actiontype_id) VALUES (false,now(),'Специальная акция',(select max(id) from actiontype));

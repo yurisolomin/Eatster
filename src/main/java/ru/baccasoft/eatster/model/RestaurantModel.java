@@ -1,7 +1,5 @@
 package ru.baccasoft.eatster.model;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,9 +7,12 @@ public class RestaurantModel extends CommonNamedModel {
     public static final String STAT_ACTIVE = "active";
     public static final String STAT_INACTIVE = "inactive";
     public static final String STAT_UNAUTH = "unauthorized";
+    public static final String STAT_DELETED = "deleted";
     private static final String STAT_ACTIVE_RUS = "Активно";
     private static final String STAT_INACTIVE_RUS = "Не активно";
-    private static final String STAT_UNAUTH_RUS = "Неавторизированное";
+    //так исторически сложилось, что unauthorized это "Авторизированное по e-mail"
+    private static final String STAT_UNAUTH_RUS = "Авторизированное по e-mail"; 
+    private static final String STAT_DELETED_RUS = "Удален"; 
     
     private String description;
     private String status;//active,inactive,authemail
@@ -765,6 +766,7 @@ public class RestaurantModel extends CommonNamedModel {
         list.add(new RestaurantStatus(STAT_ACTIVE,STAT_ACTIVE_RUS));
         list.add(new RestaurantStatus(STAT_INACTIVE,STAT_INACTIVE_RUS));
         list.add(new RestaurantStatus(STAT_UNAUTH,STAT_UNAUTH_RUS));
+        list.add(new RestaurantStatus(STAT_DELETED,STAT_DELETED_RUS));
         return list;
     }
 

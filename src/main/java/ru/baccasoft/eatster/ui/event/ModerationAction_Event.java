@@ -2,7 +2,7 @@ package ru.baccasoft.eatster.ui.event;
 
 import com.github.wolfie.blackboard.Event;
 import ru.baccasoft.eatster.model.ActionModel;
-import ru.baccasoft.eatster.ui.component.ModerationPhotoPanel.ModerationType;
+import ru.baccasoft.eatster.ui.component.ComponentModerationPhoto.ModerationType;
 
 public class ModerationAction_Event implements Event {
 

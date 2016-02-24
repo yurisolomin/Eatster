@@ -7,11 +7,10 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 public class ThanksForSignWindow extends Window {
-    
-    private static final long serialVersionUID = 1L;
 
     private static final float WINDOW_WIDTH = 12;
     private static final float WINDOW_HIGHT = 7;
+    private static final long serialVersionUID = 3522773723321691739L;
     private Button buttonOk;
     
     public ThanksForSignWindow(Button.ClickListener listener) {

@@ -25,10 +25,8 @@ import ru.baccasoft.utils.logging.Logger;
 public class WaiterMainView extends VerticalLayout implements View, Button.ClickListener {
 
     private static final Logger LOG = Logger.getLogger(WaiterMainView.class);
-
-    private static final long serialVersionUID = 1L;
     public static final String NAME = "wmain";
-//    private static final float WIDTH_BUTTON = 4f;
+    private static final long serialVersionUID = -2330448148055082003L;
 
     private final Button addScoreButton = new WButton("Начисление", this);;
     private final Button decScoreButton = new WButton("Списание", this);
@@ -39,74 +37,7 @@ public class WaiterMainView extends VerticalLayout implements View, Button.Click
 
     public WaiterMainView() {
     }
-/*
-    @PostConstruct
-    void init() {
-        setSizeFull();
-        
-        VerticalLayout scoreLayout = new VerticalLayout(new WLabel("")
-                        ,addScoreButton,new WLabel(""),new WLabel(""),new WLabel("")
-                        ,decScoreButton);
-        scoreLayout.setSpacing(true);
-        scoreLayout.setMargin(new MarginInfo(true, true, true, true));
-        addComponent(scoreLayout);
-
-        VerticalLayout bottomLayout = new VerticalLayout(cancelButton);
-        bottomLayout.setMargin(new MarginInfo(true, true, true, true));
-        addComponent(bottomLayout);
-        setComponentAlignment(bottomLayout, Alignment.BOTTOM_CENTER);
-    }
-*/
-/*    
-    @PostConstruct
-    void init() {
-        setSizeFull();
-        
-        VerticalLayout fields = new VerticalLayout(new WLabel("")
-                        ,addScoreButton,new WLabel(""),new WLabel(""),new WLabel("")
-                        ,decScoreButton);
-        fields.setWidth("100%");
-        fields.setSpacing(true);
-        fields.setMargin(new MarginInfo(true, true, true, true));
-
-        
-        VerticalLayout viewLayout = new VerticalLayout(fields);
-        viewLayout.setWidth("100%");
-        viewLayout.setComponentAlignment(fields, Alignment.TOP_CENTER);
-        viewLayout.setStyleName(Reindeer.LAYOUT_BLUE);
-        viewLayout.setHeightUndefined();
-        addComponent(viewLayout);
-        
-        VerticalLayout bottomLayout = new VerticalLayout(cancelButton);
-        cancelButton.setWidth("100%");
-        cancelButton.setHeightUndefined();
-        bottomLayout.setMargin(new MarginInfo(true, true, true, true));
-        bottomLayout.setWidth("100%");
-        bottomLayout.setHeight("100%");
-        bottomLayout.setComponentAlignment(cancelButton, Alignment.BOTTOM_CENTER);
-        addComponent(bottomLayout);
-    }
-*/
-/*    
-    @PostConstruct
-    void init() {
-        setSizeFull();
-        GridLayout grid = new GridLayout(1,5);
-        grid.setSizeFull();
-        grid.setMargin(new MarginInfo(true, true, true, true));
-        
-        grid.addComponent(addScoreButton, 0, 0);
-        grid.addComponent(new WLabel(""), 0, 1);
-        grid.addComponent(decScoreButton, 0, 2);
-        grid.addComponent(new WLabel(""), 0, 3);
-        grid.addComponent(new WLabel(""), 0, 3);
-        grid.addComponent(cancelButton, 0, 4);
-        addComponent(grid);
-        //addScoreButton.setHeightUndefined();
-        //decScoreButton.setHeightUndefined();
-        //cancelButton.setHeightUndefined();
-    }
-*/    
+    
     @PostConstruct
     void init() {
         setWidth("100%");
@@ -146,10 +77,10 @@ public class WaiterMainView extends VerticalLayout implements View, Button.Click
     @Override
     public void buttonClick(Button.ClickEvent event) {
         if (event.getButton() == addScoreButton) {
-            getUI().fire(new SwitchView_Event(WaiterScoreAddView.NAME));
+            getUI().fire(new SwitchView_Event(WaiterPanelAddView.NAME));
         }
         if (event.getButton() == decScoreButton) {
-            getUI().fire(new SwitchView_Event(WaiterScoreDecView.NAME));
+            getUI().fire(new SwitchView_Event(WaiterPanelDecView.NAME));
         }
         if (event.getButton() == cancelButton) {
             getUI().fire(new Logout_Event());
